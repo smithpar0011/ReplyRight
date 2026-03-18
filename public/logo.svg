@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;display=swap');
+    </style>
+  </defs>
+  <text
+    x="16"
+    y="58"
+    font-family="'Instrument Serif', Georgia, 'Times New Roman', serif"
+    font-size="52"
+    fill="#0f1f38"
+    letter-spacing="-1"
+  >Reply<tspan fill="#2e7df7">Right</tspan></text>
+</svg>
