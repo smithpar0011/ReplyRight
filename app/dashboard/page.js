@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { BUSINESS_TYPE_OPTIONS } from "../lib/businessTypes";
 
 const STAR_MAP = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
 const TONES = ["professional", "friendly", "apologetic", "enthusiastic"];
@@ -40,6 +41,15 @@ export default function Dashboard() {
   const [posting, setPosting] = useState({});
   const [posted, setPosted] = useState({});
   const [editingId, setEditingId] = useState(null);
+  const [bizType, setBizType] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("rr_bizType") || "";
+    return "";
+  });
+
+  function handleBizTypeChange(val) {
+    setBizType(val);
+    if (typeof window !== "undefined") localStorage.setItem("rr_bizType", val);
+  }
 
   useEffect(() => {
     fetch("/api/reviews")
@@ -64,15 +74,20 @@ export default function Dashboard() {
     const id = review.name;
     setGenerating((g) => ({ ...g, [id]: true }));
     try {
+      // Collect all already-generated responses to prevent duplicate phrases
+      const previousResponses = Object.values(responses).filter(Boolean);
+
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bizName: currentLoc.locationName,
-          bizType: "business",
+          bizType: bizType || currentLoc.bizType || "local business",
           stars: STAR_MAP[review.starRating] || 5,
           reviewText: review.comment,
+          reviewerName: review.reviewer,
           tone,
+          previousResponses,
         }),
       });
       const data = await res.json();
@@ -173,6 +188,13 @@ export default function Dashboard() {
           padding: .7rem 2rem; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
         }
         .tone-label { font-size: .75rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: .08em; }
+        .biz-type-select {
+          border: 1.5px solid var(--cream-dark); border-radius: 6px; background: var(--cream);
+          color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-size: .78rem;
+          padding: .3rem .7rem; cursor: pointer; outline: none; margin-left: auto;
+          transition: border-color .15s;
+        }
+        .biz-type-select:focus { border-color: var(--accent); }
         .tone-pill {
           padding: .32rem .85rem; border-radius: 100px; font-size: .78rem; font-weight: 500;
           cursor: pointer; font-family: 'DM Sans', sans-serif;
@@ -347,6 +369,21 @@ export default function Dashboard() {
                 {t[0].toUpperCase() + t.slice(1)}
               </button>
             ))}
+            <select
+              className="biz-type-select"
+              value={bizType}
+              onChange={(e) => handleBizTypeChange(e.target.value)}
+              title="Set your business type for smarter AI responses"
+            >
+              <option value="">Business Type (optional)</option>
+              {BUSINESS_TYPE_OPTIONS.map((group) => (
+                <optgroup key={group.group} label={group.group}>
+                  {group.options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
 
           <div className="dash-main">

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { BUSINESS_TYPE_OPTIONS } from "./lib/businessTypes";
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false);
@@ -142,8 +143,9 @@ export default function Home() {
 
   return (
     <>
-      <style>{`
+      <style suppressHydrationWarning>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        input, select, textarea, button { font-family: 'DM Sans', sans-serif; font-size: inherit; }
         :root {
           --navy: #0f1f38; --blue: #1e4d8c; --accent: #2e7df7;
           --accent-light: #5b9bff; --gold: #c8a96e; --gold-light: #e8cfa0;
@@ -228,7 +230,7 @@ export default function Home() {
         .field-label { display: block; font-size: .72rem; font-weight: 600; color: var(--text-mid); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .4rem; }
         .field-input, .field-select, .field-textarea { width: 100%; padding: .7rem .9rem; border: 1.5px solid var(--cream-dark); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .9rem; color: var(--text-dark); background: var(--white); transition: border-color .2s; outline: none; resize: none; }
         .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--accent); }
-        .field-textarea { min-height: 95px; }
+        .field-textarea { min-height: 95px; font-family: 'DM Sans', sans-serif; font-size: .9rem; }
         .stars-row { display: flex; gap: .3rem; margin-bottom: 1rem; }
         .star-btn { font-size: 1.6rem; cursor: pointer; transition: all .15s; background: none; border: none; padding: 0; line-height: 1; }
 
@@ -362,6 +364,7 @@ export default function Home() {
           .demo-grid { grid-template-columns: 1fr; }
           .history-card { grid-template-columns: 1fr; }
           footer { flex-direction: column; text-align: center; }
+          .why-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -403,9 +406,11 @@ export default function Home() {
       <nav>
         <div className="logo">Reply<span>Right</span></div>
         <div className="nav-links">
+          <button className="nav-btn" onClick={() => scrollTo("why")}>Why It Works</button>
           <button className="nav-btn" onClick={() => scrollTo("demo")}>Live Demo</button>
           <button className="nav-btn" onClick={() => scrollTo("how")}>How It Works</button>
           <button className="nav-btn" onClick={() => scrollTo("pricing")}>Pricing</button>
+          <button className="nav-btn" onClick={() => scrollTo("faq")}>FAQ</button>
           <button className="nav-btn nav-cta" onClick={openModal}>Start Free Trial</button>
         </div>
       </nav>
@@ -435,6 +440,59 @@ export default function Home() {
 
       <div className="divider" />
 
+      {/* WHY IT WORKS */}
+      <section className="section section-white" id="why">
+        <div className="section-label">Backed By Research</div>
+        <h2 className="section-title">Silence is costing you customers</h2>
+        <p className="section-sub">The data is clear — businesses that respond to reviews rank higher, get more clicks, and convert more customers.</p>
+        <div style={{maxWidth:900,margin:"0 auto 3rem",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"1.5rem"}}>
+          {[
+            {stat:"97%", desc:"of customers read business responses before deciding to visit", color:"#2e7df7"},
+            {stat:"20%", desc:"of your Google local ranking is now determined by review signals", color:"#0f1f38"},
+            {stat:"126%", desc:"more traffic for businesses in Google top 3 local results", color:"#2e7df7"},
+            {stat:"82%", desc:"of consumers say reviews are the #1 factor in their trust decision", color:"#0f1f38"},
+          ].map(s => (
+            <div key={s.stat} style={{background:"var(--cream)",borderRadius:14,padding:"2rem 1.5rem",textAlign:"center",border:"1px solid var(--cream-dark)"}}>
+              <div style={{fontFamily:"'Instrument Serif', serif",fontSize:"3rem",fontWeight:700,color:s.color,lineHeight:1,marginBottom:"0.8rem"}}>{s.stat}</div>
+              <div style={{fontSize:"0.84rem",color:"var(--text-mid)",lineHeight:1.6}}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+        <div className="why-grid" style={{maxWidth:900,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+          <div style={{background:"var(--navy)",borderRadius:16,padding:"2.5rem",color:"white"}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"#5b9bff",marginBottom:"0.8rem"}}>Google Rankings</div>
+            <h3 style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.6rem",marginBottom:"1rem",lineHeight:1.2}}>Responding moves you up Google Search</h3>
+            <p style={{fontSize:"0.9rem",color:"rgba(255,255,255,0.7)",lineHeight:1.8,marginBottom:"1.2rem"}}>Review signals now make up 20% of your local Google ranking — the fastest-growing ranking factor since 2023. Businesses responding to 80%+ of reviews see a 10–20% ranking boost in local search results.</p>
+            <div style={{borderTop:"1px solid rgba(255,255,255,0.15)",paddingTop:"1.2rem",fontSize:"0.82rem",color:"rgba(255,255,255,0.5)",fontStyle:"italic"}}>Source: BrightLocal Local Search Ranking Factors 2026, Search Engine Land</div>
+          </div>
+          <div style={{background:"var(--cream)",borderRadius:16,padding:"2.5rem",border:"1px solid var(--cream-dark)"}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--accent)",marginBottom:"0.8rem"}}>Consumer Psychology</div>
+            <h3 style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.6rem",color:"var(--navy)",marginBottom:"1rem",lineHeight:1.2}}>Your response is an ad to every future customer</h3>
+            <p style={{fontSize:"0.9rem",color:"var(--text-mid)",lineHeight:1.8,marginBottom:"1.2rem"}}>97% of people who read reviews also read the owner response. Your reply isn't just for the reviewer — it's a public message to every future customer deciding whether to trust you.</p>
+            <div style={{borderTop:"1px solid var(--cream-dark)",paddingTop:"1.2rem",fontSize:"0.82rem",color:"var(--text-light)",fontStyle:"italic"}}>Source: ReviewTrackers Consumer Survey, LocaliQ</div>
+          </div>
+          <div style={{background:"var(--cream)",borderRadius:16,padding:"2.5rem",border:"1px solid var(--cream-dark)"}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--accent)",marginBottom:"0.8rem"}}>The Cost of Silence</div>
+            <h3 style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.6rem",color:"var(--navy)",marginBottom:"1rem",lineHeight:1.2}}>63% of businesses never respond. Don't be one of them.</h3>
+            <p style={{fontSize:"0.9rem",color:"var(--text-mid)",lineHeight:1.8,marginBottom:"1.2rem"}}>63% of customers say a business never responded to their review. Every unanswered review signals to future customers that nobody is home. One unanswered 1-star review can cost up to 30 potential customers.</p>
+            <div style={{borderTop:"1px solid var(--cream-dark)",paddingTop:"1.2rem",fontSize:"0.82rem",color:"var(--text-light)",fontStyle:"italic"}}>Source: ReviewTrackers, Harvard Business Review</div>
+          </div>
+          <div style={{background:"var(--accent)",borderRadius:16,padding:"2.5rem",color:"white"}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"rgba(255,255,255,0.7)",marginBottom:"0.8rem"}}>Revenue Impact</div>
+            <h3 style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.6rem",marginBottom:"1rem",lineHeight:1.2}}>Better reviews = measurable revenue growth</h3>
+            <p style={{fontSize:"0.9rem",color:"rgba(255,255,255,0.85)",lineHeight:1.8,marginBottom:"1.2rem"}}>Positive Google review profiles are linked to up to 18% revenue growth. Customers spend 31% more with businesses that have excellent reviews. Top 3 local results get 126% more traffic than everyone else.</p>
+            <div style={{borderTop:"1px solid rgba(255,255,255,0.25)",paddingTop:"1.2rem",fontSize:"0.82rem",color:"rgba(255,255,255,0.6)",fontStyle:"italic"}}>Source: SocialPilot, Podium Consumer Research, LocaliQ</div>
+          </div>
+        </div>
+        <div style={{maxWidth:700,margin:"3rem auto 0",textAlign:"center",padding:"2.5rem",background:"var(--navy)",borderRadius:16}}>
+          <div style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.8rem",color:"white",lineHeight:1.3,marginBottom:"1rem"}}>"Businesses that respond to reviews rank higher, convert more customers, and earn more revenue — automatically."</div>
+          <div style={{fontSize:"0.82rem",color:"rgba(255,255,255,0.5)"}}>The science is settled. The only question is whether you are doing it.</div>
+          <button className="cta-btn" style={{marginTop:"1.5rem"}} onClick={() => scrollTo("demo")}>See It Work — Free Demo Below</button>
+        </div>
+      </section>
+
+      <div className="divider" />
+
       {/* DEMO */}
       <section className="section section-white" id="demo">
         <div className="section-label">Live Demo</div>
@@ -459,8 +517,12 @@ export default function Home() {
               <div>
                 <label className="field-label">Business Type</label>
                 <select className="field-select" value={bizType} onChange={e => setBizType(e.target.value)}>
-                  {["restaurant","hair salon","dental office","auto repair shop","gym","hotel","retail store","medical clinic"].map(t => (
-                    <option key={t} value={t}>{t[0].toUpperCase()+t.slice(1)}</option>
+                  {BUSINESS_TYPE_OPTIONS.map((group) => (
+                    <optgroup key={group.group} label={group.group}>
+                      {group.options.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -493,7 +555,7 @@ export default function Home() {
             </div>
 
             <label className="field-label">Customer Review</label>
-            <textarea className="field-textarea" value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Paste the customer's review here..." />
+            <textarea className="field-textarea" value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Paste the customer's review here..." style={{fontFamily:"'DM Sans', sans-serif",fontSize:".9rem",fontWeight:400}} />
 
             <button className="gen-btn" disabled={loading || !reviewText.trim()} onClick={generate}>
               {loading ? <><span>Generating</span>&nbsp;<span className="dots"><span/><span/><span/></span></> : "Generate AI Response"}
@@ -659,7 +721,7 @@ export default function Home() {
       <div className="divider" />
 
       {/* FAQ */}
-      <section className="section section-cream">
+      <section id="faq" className="section section-cream">
         <div className="section-label">FAQ</div>
         <h2 className="section-title">Common questions</h2>
         <p className="section-sub">Everything you need to know before getting started.</p>
