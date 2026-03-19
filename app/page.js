@@ -34,6 +34,19 @@ export default function Home() {
   const [modalName, setModalName] = useState("");
   const [modalSubmitted, setModalSubmitted] = useState(false);
 
+  // Contact modal
+  const [showContact, setShowContact] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMsg, setContactMsg] = useState("");
+  const sendContact = () => {
+    if (!contactEmail.trim() || !contactMsg.trim()) return;
+    const subject = encodeURIComponent(`ReplyRight Support${contactName ? ` — ${contactName}` : ""}`);
+    const body = encodeURIComponent(`Name: ${contactName || "Not provided"}\nEmail: ${contactEmail}\n\nMessage:\n${contactMsg}`);
+    window.location.href = `mailto:Support@replyrightapp.com?subject=${subject}&body=${body}`;
+    setTimeout(() => { setShowContact(false); setContactName(""); setContactEmail(""); setContactMsg(""); }, 400);
+  };
+
   // Improvement 4: Response history
   const [history, setHistory] = useState([]);
 
@@ -365,6 +378,7 @@ export default function Home() {
           .history-card { grid-template-columns: 1fr; }
           footer { flex-direction: column; text-align: center; }
           .why-grid { grid-template-columns: 1fr !important; }
+          .beforeafter-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -688,33 +702,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* COMPARISON */}
-      <section className="section section-white">
-        <div className="section-label">Why ReplyRight</div>
-        <h2 className="section-title">Stop losing customers to silence</h2>
-        <p className="section-sub">Businesses that respond to reviews get 45% more visits. Here's how the options stack up.</p>
-        <div style={{maxWidth:760,margin:"0 auto",borderRadius:16,overflow:"hidden",border:"1.5px solid var(--cream-dark)",boxShadow:"0 4px 24px rgba(15,31,56,.07)"}}>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",background:"var(--navy)",padding:"1rem 1.4rem",gap:"1rem",alignItems:"center"}}>
-            <div style={{fontSize:".75rem",fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:".08em"}}></div>
-            {["Do Nothing","Hire Staff","ReplyRight"].map((h,i) => (
-              <div key={h} style={{textAlign:"center",fontSize:".82rem",fontWeight:700,color:i===2?"var(--gold-light)":"rgba(255,255,255,.6)"}}>{h}</div>
-            ))}
-          </div>
-          {[
-            ["Reviews responded to","0%","~60%","100%"],
-            ["Response time","Never","Hours / Days","< 2 minutes"],
-            ["Monthly cost","$0","$500–$2,000","From $29"],
-            ["Consistent tone","—","Varies","Always"],
-            ["Works 24/7","—","—","✓"],
-            ["Scales to more locations","—","$$$$","✓"],
-          ].map(([label,...vals],i) => (
-            <div key={label} style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",padding:"1rem 1.4rem",gap:"1rem",alignItems:"center",background:i%2===0?"var(--white)":"var(--cream)",borderTop:"1px solid var(--cream-dark)"}}>
-              <div style={{fontSize:".84rem",fontWeight:600,color:"var(--text-dark)"}}>{label}</div>
-              {vals.map((v,j) => (
-                <div key={j} style={{textAlign:"center",fontSize:".84rem",color:j===2?"var(--accent)":v==="—"?"var(--text-light)":"var(--text-mid)",fontWeight:j===2?600:400}}>{v}</div>
-              ))}
+      {/* BEFORE / AFTER */}
+      <section className="section section-white" id="beforeafter">
+        <div className="section-label">See The Difference</div>
+        <h2 className="section-title">What silence looks like vs. ReplyRight</h2>
+        <p className="section-sub">Every unanswered review is a missed opportunity. Here's what customers actually see.</p>
+        <div className="beforeafter-grid" style={{maxWidth:900,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"2rem"}}>
+          {/* BEFORE */}
+          <div style={{borderRadius:16,overflow:"hidden",boxShadow:"0 4px 24px rgba(15,31,56,0.08)"}}>
+            <div style={{background:"#dc2626",padding:"0.8rem 1.5rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
+              <span style={{fontSize:"0.8rem",fontWeight:700,color:"white",letterSpacing:"0.1em",textTransform:"uppercase"}}>✗ Without ReplyRight</span>
             </div>
-          ))}
+            <div style={{background:"white",padding:"1.5rem"}}>
+              <div style={{marginBottom:"1.2rem",paddingBottom:"1.2rem",borderBottom:"1px solid #f1f1f1"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.5rem"}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",background:"#e5e7eb",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.8rem",fontWeight:700,color:"#6b7280"}}>S</div>
+                  <div>
+                    <div style={{fontSize:"0.85rem",fontWeight:600,color:"#111"}}>Sarah M.</div>
+                    <div style={{color:"#f59e0b",fontSize:"0.8rem"}}>★★★★★</div>
+                  </div>
+                  <div style={{marginLeft:"auto",fontSize:"0.75rem",color:"#9ca3af"}}>2 weeks ago</div>
+                </div>
+                <p style={{fontSize:"0.88rem",color:"#374151",lineHeight:1.6}}>"Absolutely loved the food! The pasta was incredible and our server was so attentive. Will definitely be back soon!"</p>
+                <div style={{marginTop:"0.8rem",padding:"0.7rem",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca"}}>
+                  <p style={{fontSize:"0.78rem",color:"#dc2626",fontStyle:"italic"}}>⚠ No response from owner — 2 weeks later</p>
+                </div>
+              </div>
+              <div style={{marginBottom:"1.2rem",paddingBottom:"1.2rem",borderBottom:"1px solid #f1f1f1"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.5rem"}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",background:"#e5e7eb",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.8rem",fontWeight:700,color:"#6b7280"}}>J</div>
+                  <div>
+                    <div style={{fontSize:"0.85rem",fontWeight:600,color:"#111"}}>James T.</div>
+                    <div style={{color:"#f59e0b",fontSize:"0.8rem"}}>★★☆☆☆</div>
+                  </div>
+                  <div style={{marginLeft:"auto",fontSize:"0.75rem",color:"#9ca3af"}}>1 month ago</div>
+                </div>
+                <p style={{fontSize:"0.88rem",color:"#374151",lineHeight:1.6}}>"Waited 45 minutes for our food and it came out cold. Really disappointed."</p>
+                <div style={{marginTop:"0.8rem",padding:"0.7rem",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca"}}>
+                  <p style={{fontSize:"0.78rem",color:"#dc2626",fontStyle:"italic"}}>⚠ No response from owner — potential customers see this and leave</p>
+                </div>
+              </div>
+              <div style={{padding:"1rem",background:"#fef2f2",borderRadius:10,textAlign:"center"}}>
+                <div style={{fontSize:"0.82rem",fontWeight:700,color:"#dc2626"}}>Result: Customers choose your competitor</div>
+                <div style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.3rem"}}>63% of customers say businesses never responded to their review</div>
+              </div>
+            </div>
+          </div>
+          {/* AFTER */}
+          <div style={{borderRadius:16,overflow:"hidden",boxShadow:"0 4px 24px rgba(15,31,56,0.08)"}}>
+            <div style={{background:"#16a34a",padding:"0.8rem 1.5rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
+              <span style={{fontSize:"0.8rem",fontWeight:700,color:"white",letterSpacing:"0.1em",textTransform:"uppercase"}}>✓ With ReplyRight</span>
+            </div>
+            <div style={{background:"white",padding:"1.5rem"}}>
+              <div style={{marginBottom:"1.2rem",paddingBottom:"1.2rem",borderBottom:"1px solid #f1f1f1"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.5rem"}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",background:"#e5e7eb",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.8rem",fontWeight:700,color:"#6b7280"}}>S</div>
+                  <div>
+                    <div style={{fontSize:"0.85rem",fontWeight:600,color:"#111"}}>Sarah M.</div>
+                    <div style={{color:"#f59e0b",fontSize:"0.8rem"}}>★★★★★</div>
+                  </div>
+                  <div style={{marginLeft:"auto",fontSize:"0.75rem",color:"#9ca3af"}}>2 weeks ago</div>
+                </div>
+                <p style={{fontSize:"0.88rem",color:"#374151",lineHeight:1.6}}>"Absolutely loved the food! The pasta was incredible and our server was so attentive. Will definitely be back soon!"</p>
+                <div style={{marginTop:"0.8rem",padding:"0.9rem",background:"#f0fdf4",borderRadius:8,border:"1px solid #86efac"}}>
+                  <div style={{fontSize:"0.72rem",fontWeight:700,color:"#16a34a",marginBottom:"0.4rem"}}>Owner responded · 3 minutes later</div>
+                  <p style={{fontSize:"0.82rem",color:"#374151",lineHeight:1.6,fontStyle:"italic"}}>"Thank you so much Sarah! We're thrilled you enjoyed the pasta — it's our chef's pride! We can't wait to welcome you back. See you soon! 🍝"</p>
+                </div>
+              </div>
+              <div style={{marginBottom:"1.2rem",paddingBottom:"1.2rem",borderBottom:"1px solid #f1f1f1"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.5rem"}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",background:"#e5e7eb",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.8rem",fontWeight:700,color:"#6b7280"}}>J</div>
+                  <div>
+                    <div style={{fontSize:"0.85rem",fontWeight:600,color:"#111"}}>James T.</div>
+                    <div style={{color:"#f59e0b",fontSize:"0.8rem"}}>★★☆☆☆</div>
+                  </div>
+                  <div style={{marginLeft:"auto",fontSize:"0.75rem",color:"#9ca3af"}}>1 month ago</div>
+                </div>
+                <p style={{fontSize:"0.88rem",color:"#374151",lineHeight:1.6}}>"Waited 45 minutes for our food and it came out cold. Really disappointed."</p>
+                <div style={{marginTop:"0.8rem",padding:"0.9rem",background:"#f0fdf4",borderRadius:8,border:"1px solid #86efac"}}>
+                  <div style={{fontSize:"0.72rem",fontWeight:700,color:"#16a34a",marginBottom:"0.4rem"}}>Owner responded · 5 minutes later</div>
+                  <p style={{fontSize:"0.82rem",color:"#374151",lineHeight:1.6,fontStyle:"italic"}}>"James, we're truly sorry about your experience. A 45-minute wait is unacceptable and we take full responsibility. Please reach out to us directly and we'd love to make it right for you."</p>
+                </div>
+              </div>
+              <div style={{padding:"1rem",background:"#f0fdf4",borderRadius:10,textAlign:"center"}}>
+                <div style={{fontSize:"0.82rem",fontWeight:700,color:"#16a34a"}}>Result: Customers choose YOU</div>
+                <div style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.3rem"}}>97% of customers read owner responses before visiting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{textAlign:"center",marginTop:"2.5rem"}}>
+          <p style={{color:"var(--text-mid)",fontSize:"0.95rem",marginBottom:"1.5rem"}}>ReplyRight generates responses like these automatically — for every review, within minutes, 24/7.</p>
+          <button className="btn-primary" onClick={() => scrollTo("demo")}>See It In Action — Free Demo</button>
         </div>
       </section>
 
@@ -727,12 +806,14 @@ export default function Home() {
         <p className="section-sub">Everything you need to know before getting started.</p>
         <div style={{maxWidth:680,margin:"0 auto",display:"flex",flexDirection:"column",gap:"1rem"}}>
           {[
+            ["Will the responses sound like a robot wrote them?","No — that's the whole point. Our AI is trained to write responses that sound genuinely human, warm, and specific to each review. It references details the customer mentioned, matches your business type, and avoids generic phrases like 'We value your feedback.' Most customers can't tell the difference from a hand-written response."],
             ["Does ReplyRight post replies automatically?","Yes. Once you connect your Google Business Profile, ReplyRight detects new reviews and posts a personalized AI response automatically — no action needed on your part."],
-            ["Will the responses sound like a robot?","No. ReplyRight uses advanced AI to craft natural, context-aware replies that match your chosen tone. You can set it to professional, friendly, apologetic, or enthusiastic — customers won't be able to tell the difference."],
-            ["What if I want to review responses before they post?","Coming soon — you'll be able to enable an approval mode where responses queue for your sign-off before posting."],
-            ["Do I need technical skills to set up?","None at all. Here's the entire setup process: (1) Click 'Start Free Trial' and sign in with the Google account tied to your Google Business Profile. (2) Grant ReplyRight access to your Business Profile — this takes one click. (3) Select which business location to manage. That's it. No code, no configuration, no technical knowledge required. You'll be live in under 2 minutes."],
+            ["What happens if I get a really bad or complicated review?","ReplyRight handles 1-star reviews with extra care — apologizing sincerely, taking ownership, and inviting the customer to reach out directly. For unusual or sensitive reviews, you can use our approval mode (Pro plan) to review responses before they're posted."],
+            ["Do I need any technical skills to set this up?","None at all. Here's the entire setup process: (1) Click 'Start Free Trial' and sign in with the Google account tied to your Google Business Profile. (2) Grant ReplyRight access to your Business Profile — this takes one click. (3) Select which business location to manage. That's it. No code, no configuration, no technical knowledge required. You'll be live in under 2 minutes."],
+            ["Will this work for my type of business?","ReplyRight works for any business with a Google Business Profile — restaurants, hair salons, dental offices, auto repair shops, gyms, hotels, retail stores, medical clinics, and more. Our AI adapts its tone and language to match your specific industry."],
             ["What happens after my 14-day trial?","After your 14-day free trial, you'll be automatically enrolled in the Starter plan ($29/month) unless you cancel or upgrade before the trial ends. You can cancel anytime from your account settings with no penalty."],
-            ["Can I cancel anytime?","Yes. No contracts, no cancellation fees. Cancel from your account settings in one click."],
+            ["Can I cancel anytime?","Yes, absolutely. No contracts, no cancellation fees. Cancel anytime from your account dashboard and your subscription ends at the close of your current billing period. We also offer a 14-day free trial with no credit card required so you can try it risk-free."],
+            ["How is this different from just using ChatGPT?","ChatGPT requires you to manually copy each review, write a prompt, generate a response, copy it back, and paste it into Google — every single time, for every review. ReplyRight connects directly to your Google Business Profile and does all of this automatically, the moment a new review comes in, 24/7. You never have to think about it."],
             ["Is my Google account data safe?","ReplyRight only requests access to your Business Profile reviews. We never access your personal Gmail, contacts, or other Google data."],
           ].map(([q,a],i) => (
             <FaqItem key={i} q={q} a={a} />
@@ -760,10 +841,44 @@ export default function Home() {
         <div style={{display:"flex",gap:"1.5rem",flexWrap:"wrap"}}>
           <a href="/privacy" style={{color:"rgba(255,255,255,.35)",fontSize:".78rem",textDecoration:"none"}}>Privacy Policy</a>
           <a href="/terms" style={{color:"rgba(255,255,255,.35)",fontSize:".78rem",textDecoration:"none"}}>Terms of Service</a>
-          <a href="mailto:hello@replyright.ai" style={{color:"rgba(255,255,255,.35)",fontSize:".78rem",textDecoration:"none"}}>Contact</a>
+          <button onClick={() => setShowContact(true)} style={{background:"none",border:"none",color:"rgba(255,255,255,.35)",fontSize:".78rem",cursor:"pointer",fontFamily:"'DM Sans', sans-serif",padding:0}}>Contact</button>
         </div>
         <p>© 2026 ReplyRight. All rights reserved.</p>
       </footer>
+
+      {/* CONTACT MODAL */}
+      {showContact && (
+        <div onClick={e => { if(e.target===e.currentTarget) setShowContact(false); }} style={{position:"fixed",inset:0,background:"rgba(10,22,40,.7)",backdropFilter:"blur(6px)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:"1rem"}}>
+          <div style={{background:"var(--white)",borderRadius:18,padding:"2.5rem",maxWidth:480,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,.3)",position:"relative",animation:"fadeUp .3s ease both"}}>
+            <button onClick={() => setShowContact(false)} style={{position:"absolute",top:"1rem",right:"1.2rem",background:"none",border:"none",fontSize:"1.3rem",cursor:"pointer",color:"var(--text-light)",lineHeight:1}}>×</button>
+            <div style={{marginBottom:"1.5rem"}}>
+              <h3 style={{fontFamily:"'Instrument Serif', serif",fontSize:"1.8rem",color:"var(--navy)",marginBottom:".4rem"}}>Get in touch</h3>
+              <p style={{fontSize:".88rem",color:"var(--text-mid)"}}>Questions, feedback, or need help? We're here.</p>
+              <a href="mailto:Support@replyrightapp.com" style={{display:"inline-flex",alignItems:"center",gap:".4rem",marginTop:".6rem",fontSize:".82rem",color:"var(--accent)",textDecoration:"none",fontWeight:500}}>
+                ✉ Support@replyrightapp.com
+              </a>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
+              <div>
+                <label style={{display:"block",fontSize:".72rem",fontWeight:600,color:"var(--text-mid)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:".4rem"}}>Your Name</label>
+                <input value={contactName} onChange={e=>setContactName(e.target.value)} placeholder="Jane Smith" style={{width:"100%",padding:".7rem .9rem",border:"1.5px solid var(--cream-dark)",borderRadius:8,fontFamily:"'DM Sans', sans-serif",fontSize:".9rem",color:"var(--text-dark)",background:"var(--cream)",outline:"none"}} onFocus={e=>e.target.style.borderColor="var(--accent)"} onBlur={e=>e.target.style.borderColor="var(--cream-dark)"} />
+              </div>
+              <div>
+                <label style={{display:"block",fontSize:".72rem",fontWeight:600,color:"var(--text-mid)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:".4rem"}}>Email Address <span style={{color:"#dc2626"}}>*</span></label>
+                <input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} placeholder="you@example.com" type="email" style={{width:"100%",padding:".7rem .9rem",border:"1.5px solid var(--cream-dark)",borderRadius:8,fontFamily:"'DM Sans', sans-serif",fontSize:".9rem",color:"var(--text-dark)",background:"var(--cream)",outline:"none"}} onFocus={e=>e.target.style.borderColor="var(--accent)"} onBlur={e=>e.target.style.borderColor="var(--cream-dark)"} />
+              </div>
+              <div>
+                <label style={{display:"block",fontSize:".72rem",fontWeight:600,color:"var(--text-mid)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:".4rem"}}>Message <span style={{color:"#dc2626"}}>*</span></label>
+                <textarea value={contactMsg} onChange={e=>setContactMsg(e.target.value)} placeholder="How can we help?" rows={4} style={{width:"100%",padding:".7rem .9rem",border:"1.5px solid var(--cream-dark)",borderRadius:8,fontFamily:"'DM Sans', sans-serif",fontSize:".9rem",color:"var(--text-dark)",background:"var(--cream)",outline:"none",resize:"vertical"}} onFocus={e=>e.target.style.borderColor="var(--accent)"} onBlur={e=>e.target.style.borderColor="var(--cream-dark)"} />
+              </div>
+              <button onClick={sendContact} disabled={!contactEmail.trim()||!contactMsg.trim()} style={{background:"var(--navy)",color:"white",border:"none",padding:".88rem",borderRadius:8,fontFamily:"'DM Sans', sans-serif",fontSize:".92rem",fontWeight:600,cursor:"pointer",opacity:(!contactEmail.trim()||!contactMsg.trim()) ? 0.55 : 1,transition:"all .2s"}}>
+                Open Email to Send →
+              </button>
+              <p style={{fontSize:".74rem",color:"var(--text-light)",textAlign:"center",marginTop:"-.3rem"}}>Clicking above opens your email app with your message pre-filled.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

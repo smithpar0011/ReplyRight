@@ -65,7 +65,7 @@ export default function PrivacyPage() {
         </div>
 
         <h2>1. Who We Are</h2>
-        <p>ReplyRight is operated by <strong>Outwest Management LLC</strong>, a Utah limited liability company located in American Fork, Utah 84003. You can reach us at <a href="mailto:hello@replyright.ai" style={{color:"var(--accent)"}}>hello@replyright.ai</a>.</p>
+        <p>ReplyRight is operated by <strong>Outwest Management LLC</strong>, a Utah limited liability company located in American Fork, Utah 84003. You can reach us at <a href="mailto:Support@replyrightapp.com" style={{color:"var(--accent)"}}>Support@replyrightapp.com</a>.</p>
 
         <h2>2. Information We Collect</h2>
         <div className="table-wrap">
@@ -149,13 +149,13 @@ export default function PrivacyPage() {
           <li>Revoke your Google OAuth authorization at any time</li>
           <li>Opt out of non-essential communications</li>
         </ul>
-        <p>To exercise any of these rights, email us at <a href="mailto:hello@replyright.ai" style={{color:"var(--accent)"}}>hello@replyright.ai</a>. We will respond within 30 days.</p>
+        <p>To exercise any of these rights, email us at <a href="mailto:Support@replyrightapp.com" style={{color:"var(--accent)"}}>Support@replyrightapp.com</a>. We will respond within 30 days.</p>
 
         <h2>11. Children's Privacy</h2>
         <p>The Service is intended for business owners and adults aged 18 and older. We do not knowingly collect personal information from anyone under 18. If we become aware that we have collected data from a minor, we will delete it immediately.</p>
 
         <h2>12. California Privacy Rights (CCPA)</h2>
-        <p>If you are a California resident, you have the right to know what personal information we collect, request deletion of your personal information, and opt out of the sale of personal information. We do not sell personal information. To exercise your California rights, contact us at hello@replyright.ai.</p>
+        <p>If you are a California resident, you have the right to know what personal information we collect, request deletion of your personal information, and opt out of the sale of personal information. We do not sell personal information. To exercise your California rights, contact us at Support@replyrightapp.com.</p>
 
         <h2>13. Changes to This Policy</h2>
         <p>We may update this Privacy Policy from time to time. We will notify you of material changes by posting the updated policy on this page with a new effective date, and by email if you have an active subscription. Continued use of the Service after changes are posted constitutes your acceptance of the updated Policy.</p>
@@ -165,7 +165,7 @@ export default function PrivacyPage() {
           <p><strong>Outwest Management LLC</strong><br />
           d/b/a ReplyRight<br />
           American Fork, Utah 84003<br />
-          Email: <a href="mailto:hello@replyright.ai" style={{color:"var(--accent)"}}>hello@replyright.ai</a></p>
+          Email: <a href="mailto:Support@replyrightapp.com" style={{color:"var(--accent)"}}>Support@replyrightapp.com</a></p>
         </div>
       </div>
 
@@ -174,7 +174,7 @@ export default function PrivacyPage() {
         <div className="footer-links">
           <a href="/privacy">Privacy Policy</a>
           <a href="/terms">Terms of Service</a>
-          <a href="mailto:hello@replyright.ai">Contact</a>
+          <a href="mailto:Support@replyrightapp.com">Contact</a>
         </div>
         <p>© 2026 ReplyRight · Outwest Management LLC</p>
       </footer>

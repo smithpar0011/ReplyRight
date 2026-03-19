@@ -106,7 +106,7 @@ export default function TermsPage() {
         </div>
 
         <h2>8. Cancellation</h2>
-        <p>You may cancel your subscription at any time. Cancellation takes effect at the end of the current billing period — you retain access to the Service through the end of the period you have paid for. Cancellation does not entitle you to a refund of any fees already charged. To cancel, contact us at hello@replyright.ai or use the cancellation option in your account settings when available.</p>
+        <p>You may cancel your subscription at any time. Cancellation takes effect at the end of the current billing period — you retain access to the Service through the end of the period you have paid for. Cancellation does not entitle you to a refund of any fees already charged. To cancel, contact us at Support@replyrightapp.com or use the cancellation option in your account settings when available.</p>
 
         <h2>9. Termination by Company</h2>
         <p>Outwest Management LLC reserves the right, in its sole and absolute discretion, to suspend, restrict, or permanently terminate your access to the Service at any time, with or without notice, and for any reason or no reason, including but not limited to:</p>
@@ -168,7 +168,7 @@ export default function TermsPage() {
           <p><strong>Binding Arbitration.</strong> Any dispute, controversy, or claim arising out of or relating to these Terms or the Service — including questions of validity, interpretation, or enforcement — shall be resolved exclusively by binding individual arbitration administered by the American Arbitration Association (AAA) under its Consumer Arbitration Rules, rather than in court. The arbitration shall take place in Utah County, Utah. The arbitrator's decision shall be final and binding and may be entered as a judgment in any court of competent jurisdiction.</p>
           <p><strong>Class Action Waiver.</strong> YOU AND OUTWEST MANAGEMENT LLC EACH WAIVE THE RIGHT TO PARTICIPATE IN ANY CLASS ACTION, CLASS ARBITRATION, OR REPRESENTATIVE PROCEEDING. All disputes must be brought individually. You may not consolidate your claims with those of any other person or entity.</p>
           <p><strong>Small Claims Exception.</strong> Either party may bring an individual claim in small claims court in Utah County, Utah, provided the claim qualifies under applicable small claims rules and does not seek relief on a class or representative basis.</p>
-          <p><strong>Opt-Out.</strong> You may opt out of this arbitration agreement by sending written notice to hello@replyright.ai within 30 days of first using the Service. Opting out does not affect any other provision of these Terms.</p>
+          <p><strong>Opt-Out.</strong> You may opt out of this arbitration agreement by sending written notice to Support@replyrightapp.com within 30 days of first using the Service. Opting out does not affect any other provision of these Terms.</p>
         </div>
 
         <h2>17. Governing Law & Jurisdiction</h2>
@@ -189,7 +189,7 @@ export default function TermsPage() {
           <p><strong>Outwest Management LLC</strong><br />
           d/b/a ReplyRight<br />
           American Fork, Utah 84003<br />
-          Email: <a href="mailto:hello@replyright.ai" style={{color:"var(--accent)"}}>hello@replyright.ai</a></p>
+          Email: <a href="mailto:Support@replyrightapp.com" style={{color:"var(--accent)"}}>Support@replyrightapp.com</a></p>
         </div>
       </div>
 
@@ -198,7 +198,7 @@ export default function TermsPage() {
         <div className="footer-links">
           <a href="/privacy">Privacy Policy</a>
           <a href="/terms">Terms of Service</a>
-          <a href="mailto:hello@replyright.ai">Contact</a>
+          <a href="mailto:Support@replyrightapp.com">Contact</a>
         </div>
         <p>© 2026 ReplyRight · Outwest Management LLC</p>
       </footer>
