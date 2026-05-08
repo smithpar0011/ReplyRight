@@ -8,7 +8,7 @@ export async function GET(req) {
   const code = searchParams.get("code");
   const error = searchParams.get("error");
   const state = searchParams.get("state") || "";
-  const baseUrl = process.env.NEXTAUTH_URL || "https://www.replyrightapp.com";
+  const baseUrl = process.env.NEXTAUTH_URL || new URL(req.url).origin;
 
   if (error || !code) {
     const detail = encodeURIComponent(error || "no_code");
