@@ -1078,52 +1078,8 @@ export default function Home() {
                     >
                       {signupLoading ? "Creating account…" : "Create Account & Continue"}
                     </button>
-                    <p className="modal-fine">Already have an account? <button onClick={() => { setShowSignin(true); setSignupError(""); }} style={{background:"none",border:"none",color:"var(--navy)",fontWeight:600,fontSize:"inherit",cursor:"pointer",padding:0,fontFamily:"inherit"}}>Sign in</button></p>
+                    <p className="modal-fine">Already have an account? <a href="/signin" style={{color:"var(--navy)",fontWeight:600,textDecoration:"none"}}>Sign in</a></p>
                   </>
-                ) : (
-                  <>
-                    <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
-                      <div className="modal-icon" style={{margin:"0 auto .9rem"}}>🔑</div>
-                      <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Sign in to continue</h3>
-                      <p className="modal-sub" style={{margin:0}}>Sign in to your existing account to complete checkout.</p>
-                    </div>
-
-                    <div style={{display:"flex",flexDirection:"column",gap:".7rem",marginBottom:".5rem"}}>
-                      <input
-                        type="email"
-                        placeholder="Email address"
-                        value={signinEmail}
-                        onChange={e => setSigninEmail(e.target.value)}
-                        required
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        value={signinPassword}
-                        onChange={e => setSigninPassword(e.target.value)}
-                        required
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                    </div>
-
-                    {signupError && (
-                      <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8,padding:".6rem .9rem",marginBottom:".7rem"}}>
-                        <p style={{color:"#ef4444",fontSize:".82rem",margin:0}}>{signupError}</p>
-                      </div>
-                    )}
-
-                    <button
-                      className="modal-submit"
-                      onClick={handleSigninToCheckout}
-                      disabled={signinLoading}
-                      style={{width:"100%",opacity:signinLoading?.7:1,cursor:signinLoading?"not-allowed":"pointer"}}
-                    >
-                      {signinLoading ? "Signing in…" : "Sign In & Continue"}
-                    </button>
-                    <p className="modal-fine">New here? <button onClick={() => { setShowSignin(false); setSignupError(""); }} style={{background:"none",border:"none",color:"var(--navy)",fontWeight:600,fontSize:"inherit",cursor:"pointer",padding:0,fontFamily:"inherit"}}>Create account</button></p>
-                  </>
-                )}
               </>
             )}
 
