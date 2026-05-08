@@ -1020,9 +1020,7 @@ export default function Home() {
                     <span className="signup-selected-badge">✓ {selectedPlan} · ${annual ? PRICES[selectedPlan].annual : PRICES[selectedPlan].monthly}/mo · {annual ? "Annual" : "Monthly"}</span>
                   </div>
                 )}
-                {!showSignin ? (
-                  <>
-                    <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
+                <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
                       <div className="modal-icon" style={{margin:"0 auto .9rem"}}>👤</div>
                       <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Create your account</h3>
                       <p className="modal-sub" style={{margin:0}}>Set up your login so you can access your dashboard anytime.</p>
@@ -1074,12 +1072,11 @@ export default function Home() {
                       className="modal-submit"
                       onClick={handleSignup}
                       disabled={signupLoading}
-                      style={{width:"100%",opacity:signupLoading?.7:1,cursor:signupLoading?"not-allowed":"pointer"}}
+                      style={{width:"100%",opacity:signupLoading?0.7:1,cursor:signupLoading?"not-allowed":"pointer"}}
                     >
                       {signupLoading ? "Creating account…" : "Create Account & Continue"}
                     </button>
                     <p className="modal-fine">Already have an account? <a href="/signin" style={{color:"var(--navy)",fontWeight:600,textDecoration:"none"}}>Sign in</a></p>
-                  </>
               </>
             )}
 
@@ -1167,7 +1164,7 @@ export default function Home() {
                   className="modal-submit"
                   onClick={() => startCheckout(selectedPlan)}
                   disabled={checkoutLoading}
-                  style={{width:"100%",opacity:checkoutLoading?.7:1,cursor:checkoutLoading?"not-allowed":"pointer"}}
+                  style={{width:"100%",opacity:checkoutLoading?0.7:1,cursor:checkoutLoading?"not-allowed":"pointer"}}
                 >
                   {checkoutLoading ? "Redirecting to checkout…" : "Start 14-Day Free Trial →"}
                 </button>
