@@ -28,7 +28,7 @@ const CLOSING_STYLES = [
 
 // Comprehensive business type context — each entry gives the AI
 // industry-specific vocabulary, common pain points, and relevant response angles
-export const BUSINESS_TYPE_CONTEXT = {
+const BUSINESS_TYPE_CONTEXT = {
   // ── FOOD & DRINK ──────────────────────────────────────────────
   "restaurant": "Full-service restaurant. Relevant topics: dishes, flavors, portion size, service speed, server attentiveness, ambiance, noise level, reservations, wait times, dietary accommodations, specials, and the overall dining experience.",
   "cafe": "Café or coffee shop. Relevant topics: espresso quality, coffee sourcing, brewing methods, pastries, food items, WiFi and seating, barista skill, speed of service, loyalty programs, and atmosphere.",
