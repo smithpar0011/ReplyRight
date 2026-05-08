@@ -11,7 +11,8 @@ export async function GET(req) {
   const baseUrl = process.env.NEXTAUTH_URL || "https://www.replyrightapp.com";
 
   if (error || !code) {
-    return Response.redirect(`${baseUrl}/signin?error=1`);
+    const detail = encodeURIComponent(error || "no_code");
+    return Response.redirect(`${baseUrl}/signin?error=1&detail=${detail}`);
   }
 
   // Exchange code for tokens
