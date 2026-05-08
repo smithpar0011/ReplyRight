@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 222 47% 11%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 222 47% 11%;
+  --radius: 0.75rem;
+  --navy:       #0f1f38;
+  --blue:       #1e4d8c;
+  --accent:     #2e7df7;
+  --accent-light: #5b9bff;
+  --gold:       #c8a96e;
+  --gold-light: #e8cfa0;
+  --cream:      #f8f5ef;
+  --cream-dark: #ece8e0;
+  --white:      #ffffff;
+  --text-dark:  #0f1f38;
+  --text-mid:   #4a5568;
+  --text-light: #718096;
+  --green:      #22c55e;
+  --red:        #ef4444;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+/* Glass utility */
+.glass {
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.glass-dark {
+  background: rgba(15,31,56,0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Floating pill nav */
+.glass-nav {
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 8px 32px rgba(15,31,56,0.10);
+}
+
+/* Plasma container */
+.plasma-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Smooth transitions */
+a, button { transition: all 0.2s ease; }
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #2e7df7 0%, #c8a96e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-navy {
+    background: linear-gradient(135deg, #0f1f38 0%, #2e7df7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}

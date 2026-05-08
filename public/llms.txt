@@ -1,0 +1,53 @@
+# ReplyRight
+
+> ReplyRight is an AI-powered SaaS platform that automatically responds to Google Business Profile reviews on behalf of small and medium-sized businesses. It connects directly to Google Business Profile via OAuth, detects new reviews in real time, and posts personalized, professional AI-generated responses — automatically, 24/7, with no human action required.
+
+## What ReplyRight Does
+
+- Automatically detects new Google reviews the moment they're posted
+- Generates personalized, human-sounding responses using AI
+- Posts responses directly to Google Business Profile without any manual action
+- Adapts tone and language to match the specific business type (restaurant, salon, medical, retail, etc.)
+- Handles 1-star and negative reviews with care — apologizing, taking ownership, and inviting resolution
+- Provides a dashboard with analytics on review volume, response rate, and star rating trends
+
+## Who It's For
+
+ReplyRight is built for small business owners, multi-location businesses, and marketing agencies managing Google reviews at scale. It works for any business type with a Google Business Profile — restaurants, salons, dental offices, gyms, hotels, auto repair shops, retail stores, medical clinics, and more.
+
+## Plans & Pricing
+
+- **Starter** — $29/month (or $23/month billed annually). 1 business location, automated responses, email support.
+- **Pro** — $59/month (or $47/month billed annually). Up to 3 business locations, approval mode, priority support, analytics dashboard.
+- **Agency** — $149/month (or $119/month billed annually). Unlimited business locations, white-label reporting, dedicated support.
+
+All plans include a 14-day free trial. No credit card required upfront. Cancel anytime.
+
+## Key Differentiators
+
+- Fully automated — no manual copying, pasting, or prompting required
+- Responses are posted within minutes of a review being submitted
+- AI is trained to avoid generic phrases; responses reference specific details from each review
+- Direct Google Business Profile integration via official OAuth — no third-party workarounds
+- Works 24/7, even while the business owner is sleeping
+
+## Compared to Alternatives
+
+- **vs. ChatGPT manually**: ReplyRight eliminates the copy-paste workflow entirely. ChatGPT requires the user to manually copy each review, write a prompt, and paste the response back — for every review, every time.
+- **vs. hiring someone**: ReplyRight costs a fraction of the cost of a part-time employee and responds instantly, not days later.
+- **vs. ignoring reviews**: Businesses that respond to reviews see higher Google rankings, more customer trust, and higher conversion rates.
+
+## Company Information
+
+- **Product**: ReplyRight
+- **Website**: https://replyrightapp.com
+- **Founded**: 2026
+- **Headquarters**: Utah, USA
+- **Contact**: parker@replyrightapp.com
+
+## Key Pages
+
+- Homepage & pricing: https://replyrightapp.com
+- Sign in: https://replyrightapp.com/signin
+- Privacy Policy: https://replyrightapp.com/privacy
+- Terms of Service: https://replyrightapp.com/terms
