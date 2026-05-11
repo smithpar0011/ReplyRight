@@ -71,23 +71,54 @@ export async function GET(req) {
   );
 
   if (isSignup) {
-    // Update the user record in Supabase with Google data
+    // Find or create user from Google account
+    let user = null;
+
+    // Check by google_email first
     try {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const sessionMatch = cookieHeader.match(/rr_session=([^;]+)/);
-      if (sessionMatch) {
-        const decoded = jwt.verify(sessionMatch[1], JWT_SECRET);
-        await supabase
-          .from("users")
-          .update({
-            google_email: userInfo.email || "",
-            google_refresh_token: tokens.refresh_token || "",
-          })
-          .eq("id", decoded.userId);
-      }
-    } catch (e) {
-      console.error("Failed to update user with Google data:", e);
+      const { data } = await supabase.from("users").select("*").eq("google_email", userInfo.email).single();
+      user = data;
+    } catch (e) {}
+
+    // Fallback: check by email
+    if (!user && userInfo.email) {
+      try {
+        const { data } = await supabase.from("users").select("*").eq("email", userInfo.email).single();
+        user = data;
+      } catch (e) {}
     }
+
+    if (user) {
+      // Update existing user's Google tokens
+      await supabase.from("users").update({
+        google_email: userInfo.email || "",
+        google_refresh_token: tokens.refresh_token || "",
+      }).eq("id", user.id);
+    } else {
+      // Create new user from Google
+      try {
+        const { data } = await supabase.from("users").insert({
+          email: userInfo.email || "",
+          name: userInfo.name || "",
+          google_email: userInfo.email || "",
+          google_refresh_token: tokens.refresh_token || "",
+        }).select().single();
+        user = data;
+      } catch (e) {
+        console.error("Failed to create user from Google:", e);
+      }
+    }
+
+    // Create session for the user
+    if (user) {
+      const sessionToken = jwt.sign(
+        { userId: user.id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: "30d" }
+      );
+      headers.append("Set-Cookie", `rr_session=${sessionToken}; ${cookieOpts}; Max-Age=2592000`);
+    }
+
     headers.set("Location", `${baseUrl}/?signup=payment`);
   } else {
     // SIGN-IN flow: look up user by google_email or email

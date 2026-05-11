@@ -1011,7 +1011,7 @@ export default function Home() {
               </>
             )}
 
-            {/* ── STEP 2: CREATE ACCOUNT ── */}
+            {/* ── STEP 2: CREATE ACCOUNT WITH GOOGLE ── */}
             {planStep === 2 && (
               <>
                 <button className="signup-step-back" onClick={() => setPlanStep(1)}>← Back to plans</button>
@@ -1021,62 +1021,33 @@ export default function Home() {
                   </div>
                 )}
                 <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
-                      <div className="modal-icon" style={{margin:"0 auto .9rem"}}>👤</div>
-                      <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Create your account</h3>
-                      <p className="modal-sub" style={{margin:0}}>Set up your login so you can access your dashboard anytime.</p>
+                  <div className="modal-icon" style={{margin:"0 auto .9rem"}}>
+                    <svg width="28" height="28" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                  </div>
+                  <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Create your account</h3>
+                  <p className="modal-sub" style={{margin:0}}>Sign in with Google to create your account and connect your Business Profile in one step.</p>
+                </div>
+                <div style={{background:"var(--cream)",borderRadius:12,padding:"1rem 1.2rem",marginBottom:"1.4rem"}}>
+                  {[["1","Sign in with Google","Creates your ReplyRight account instantly"],["2","Grant profile access","Allow ReplyRight to read & reply to your reviews"],["3","Start your trial","Set up payment to begin your 14-day free trial"]].map(([n,title,desc]) => (
+                    <div key={n} style={{display:"flex",gap:".9rem",alignItems:"flex-start",marginBottom:n==="3"?"0":".85rem"}}>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:"var(--navy)",color:"white",fontSize:".68rem",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:".05rem"}}>{n}</div>
+                      <div><div style={{fontSize:".85rem",fontWeight:600,color:"var(--navy)"}}>{title}</div><div style={{fontSize:".76rem",color:"var(--text-light)",marginTop:".1rem"}}>{desc}</div></div>
                     </div>
-
-                    <div style={{display:"flex",flexDirection:"column",gap:".7rem",marginBottom:".5rem"}}>
-                      <input
-                        type="text"
-                        placeholder="Full name (optional)"
-                        value={signupName}
-                        onChange={e => setSignupName(e.target.value)}
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email address"
-                        value={signupEmail}
-                        onChange={e => setSignupEmail(e.target.value)}
-                        required
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                      <input
-                        type="password"
-                        placeholder="Password (min. 8 characters)"
-                        value={signupPassword}
-                        onChange={e => setSignupPassword(e.target.value)}
-                        required
-                        minLength={8}
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                      <input
-                        type="password"
-                        placeholder="Confirm password"
-                        value={signupConfirm}
-                        onChange={e => setSignupConfirm(e.target.value)}
-                        required
-                        minLength={8}
-                        style={{width:"100%",padding:".75rem 1rem",borderRadius:10,border:"1.5px solid var(--cream-dark)",fontSize:".9rem",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}
-                      />
-                    </div>
-
-                    {signupError && (
-                      <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8,padding:".6rem .9rem",marginBottom:".7rem"}}>
-                        <p style={{color:"#ef4444",fontSize:".82rem",margin:0}}>{signupError}</p>
-                      </div>
-                    )}
-
-                    <button
-                      className="modal-submit"
-                      onClick={handleSignup}
-                      disabled={signupLoading}
-                      style={{width:"100%",opacity:signupLoading?0.7:1,cursor:signupLoading?"not-allowed":"pointer"}}
-                    >
-                      {signupLoading ? "Creating account…" : "Create Account & Continue"}
-                    </button>
-                    <p className="modal-fine">Already have an account? <a href="/signin" style={{color:"var(--navy)",fontWeight:600,textDecoration:"none"}}>Sign in</a></p>
+                  ))}
+                </div>
+                <button
+                  className="modal-submit"
+                  type="button"
+                  onClick={() => {
+                    document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({ plan: selectedPlan, billing: annual ? "annual" : "monthly" }))}; Path=/; SameSite=Lax; Max-Age=1800`;
+                    window.location.href = process.env.NEXT_PUBLIC_MOCK_GOOGLE === "true" ? "/api/auth/mock-callback" : "/api/auth/google?flow=signup";
+                  }}
+                  style={{display:"flex",alignItems:"center",justifyContent:"center",gap:".6rem",width:"100%"}}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                  Continue with Google
+                </button>
+                <p className="modal-fine">Already have an account? <a href="/signin" style={{color:"var(--navy)",fontWeight:600,textDecoration:"none"}}>Sign in</a></p>
               </>
             )}
 
