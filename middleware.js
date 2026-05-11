@@ -50,10 +50,14 @@ export async function middleware(req) {
     }
   }
 
-  // If already signed in, skip signin page
+  // If already signed in with an active plan, skip signin page
   if (pathname === "/signin") {
     if (session) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      const planCookie = req.cookies.get("rr_plan")?.value;
+      if (planCookie) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+      // Has session but no plan — let them reach /signin to re-auth / pick a plan
     }
   }
 
