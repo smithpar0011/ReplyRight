@@ -15,6 +15,7 @@ function FaqItem({ q, a }) {
   );
 }
 
+
 export default function Home() {
   const DEMO_BY_TYPE = {
     // Food & Drink
@@ -171,6 +172,11 @@ export default function Home() {
   // Google connect state (Step 3)
   const [googleConnected, setGoogleConnected] = useState(false);
   const [connectedGoogleUser, setConnectedGoogleUser] = useState(null);
+  const [bizLocations, setBizLocations] = useState([]);
+  const [bizLocationsLoading, setBizLocationsLoading] = useState(false);
+  const [bizLocationsError, setBizLocationsError] = useState("");
+  const [selectedBizLocation, setSelectedBizLocation] = useState(null);
+  const [savingLocation, setSavingLocation] = useState(false);
 
   // Contact modal
   const [showContact, setShowContact] = useState(false);
@@ -310,7 +316,7 @@ export default function Home() {
         document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({
           plan,
           billing: annual ? "annual" : "monthly",
-        }))}; Path=/; SameSite=Lax; Max-Age=1800`;
+        }))}; Path=/; SameSite=Lax; Max-Age=604800`;
         setPlanStep(3);
       } else {
         setPlanStep(2);
@@ -343,7 +349,7 @@ export default function Home() {
       document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({
         plan: selectedPlan,
         billing: annual ? "annual" : "monthly",
-      }))}; Path=/; SameSite=Lax; Max-Age=1800`;
+      }))}; Path=/; SameSite=Lax; Max-Age=604800`;
       setPlanStep(3);
     } catch {
       setSignupError("Something went wrong. Please try again.");
@@ -383,7 +389,7 @@ export default function Home() {
       document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({
         plan: selectedPlan,
         billing: annual ? "annual" : "monthly",
-      }))}; Path=/; SameSite=Lax; Max-Age=1800`;
+      }))}; Path=/; SameSite=Lax; Max-Age=604800`;
       setPlanStep(3);
     } catch {
       setSignupError("Something went wrong. Please try again.");
@@ -410,12 +416,11 @@ export default function Home() {
     }
   }, []);
 
-  // Check for ?signup=payment on mount (returning from Google OAuth)
+  // Check for ?signup=payment on mount (returning from /setup page after location selected)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("signup") === "payment") {
-        // Read signup cookie to restore state
         const match = document.cookie.match(/rr_signup=([^;]+)/);
         if (match) {
           try {
@@ -424,7 +429,6 @@ export default function Home() {
             setAnnual(data.billing === "annual");
           } catch {}
         }
-        // Read connected Google user info
         const userMatch = document.cookie.match(/rr_user=([^;]+)/);
         if (userMatch) {
           try {
@@ -435,7 +439,6 @@ export default function Home() {
         }
         setShowModal(true);
         setPlanStep(4);
-        // Clean URL
         window.history.replaceState({}, "", "/");
       }
     }
@@ -1008,6 +1011,7 @@ export default function Home() {
                   })}
                 </div>
                 <p className="modal-fine" style={{textAlign:"center"}}>14-day free trial · Card required, charged after trial · Cancel anytime</p>
+                <p className="modal-fine" style={{textAlign:"center",marginTop:".4rem"}}>⚠️ You'll need the Google account that manages your Google Business Profile to connect your reviews.</p>
               </>
             )}
 
@@ -1027,8 +1031,14 @@ export default function Home() {
                   <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Create your account</h3>
                   <p className="modal-sub" style={{margin:0}}>Sign in with Google to create your account and connect your Business Profile in one step.</p>
                 </div>
+                <div style={{background:"rgba(251,191,36,0.12)",border:"1.5px solid rgba(251,191,36,0.4)",borderRadius:10,padding:".85rem 1rem",marginBottom:"1rem",display:"flex",gap:".7rem",alignItems:"flex-start"}}>
+                  <span style={{fontSize:"1.1rem",flexShrink:0}}>⚠️</span>
+                  <p style={{margin:0,fontSize:".82rem",color:"var(--navy)",lineHeight:1.5}}>
+                    <strong>Use the Google account that manages your Google Business Profile.</strong> This is required to read and respond to your reviews — not your personal Gmail account.
+                  </p>
+                </div>
                 <div style={{background:"var(--cream)",borderRadius:12,padding:"1rem 1.2rem",marginBottom:"1.4rem"}}>
-                  {[["1","Sign in with Google","Creates your ReplyRight account instantly"],["2","Grant profile access","Allow ReplyRight to read & reply to your reviews"],["3","Start your trial","Set up payment to begin your 14-day free trial"]].map(([n,title,desc]) => (
+                  {[["1","Sign in with Google","Use the account linked to your Google Business Profile"],["2","Grant profile access","Allow ReplyRight to read & reply to your reviews"],["3","Start your trial","Set up payment to begin your 14-day free trial"]].map(([n,title,desc]) => (
                     <div key={n} style={{display:"flex",gap:".9rem",alignItems:"flex-start",marginBottom:n==="3"?"0":".85rem"}}>
                       <div style={{width:22,height:22,borderRadius:"50%",background:"var(--navy)",color:"white",fontSize:".68rem",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:".05rem"}}>{n}</div>
                       <div><div style={{fontSize:".85rem",fontWeight:600,color:"var(--navy)"}}>{title}</div><div style={{fontSize:".76rem",color:"var(--text-light)",marginTop:".1rem"}}>{desc}</div></div>
@@ -1039,7 +1049,7 @@ export default function Home() {
                   className="modal-submit"
                   type="button"
                   onClick={() => {
-                    document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({ plan: selectedPlan, billing: annual ? "annual" : "monthly" }))}; Path=/; SameSite=Lax; Max-Age=1800`;
+                    document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify({ plan: selectedPlan, billing: annual ? "annual" : "monthly" }))}; Path=/; SameSite=Lax; Max-Age=604800`;
                     window.location.href = process.env.NEXT_PUBLIC_MOCK_GOOGLE === "true" ? "/api/auth/mock-callback" : "/api/auth/google?flow=signup";
                   }}
                   style={{display:"flex",alignItems:"center",justifyContent:"center",gap:".6rem",width:"100%"}}
@@ -1051,44 +1061,7 @@ export default function Home() {
               </>
             )}
 
-            {/* ── STEP 3: CONNECT GOOGLE ── */}
-            {planStep === 3 && (
-              <>
-                <button className="signup-step-back" onClick={() => setPlanStep(2)}>← Back</button>
-                {selectedPlan && (
-                  <div style={{textAlign:"center",marginBottom:".2rem"}}>
-                    <span className="signup-selected-badge">✓ {selectedPlan} · ${annual ? PRICES[selectedPlan].annual : PRICES[selectedPlan].monthly}/mo · {annual ? "Annual" : "Monthly"}</span>
-                  </div>
-                )}
-                <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
-                  <div className="modal-icon" style={{margin:"0 auto .9rem"}}>
-                    <svg width="28" height="28" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  </div>
-                  <h3 style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.6rem",color:"var(--navy)",letterSpacing:"-.02em",marginBottom:".4rem"}}>Connect your Google Business</h3>
-                  <p className="modal-sub" style={{margin:0}}>Link your Google Business Profile so ReplyRight can read and respond to your reviews.</p>
-                </div>
-                <div style={{background:"var(--cream)",borderRadius:12,padding:"1rem 1.2rem",marginBottom:"1.4rem"}}>
-                  {[["1","Sign in with Google","Uses your Google account linked to your Business Profile"],["2","Grant profile access","Allow ReplyRight to read & reply to your reviews"],["3","You're verified","We confirm access before you're charged"]].map(([n,title,desc]) => (
-                    <div key={n} style={{display:"flex",gap:".9rem",alignItems:"flex-start",marginBottom:n==="3"?"0":".85rem"}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:"var(--navy)",color:"white",fontSize:".68rem",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:".05rem"}}>{n}</div>
-                      <div><div style={{fontSize:".85rem",fontWeight:600,color:"var(--navy)"}}>{title}</div><div style={{fontSize:".76rem",color:"var(--text-light)",marginTop:".1rem"}}>{desc}</div></div>
-                    </div>
-                  ))}
-                </div>
-                <a href={process.env.NEXT_PUBLIC_MOCK_GOOGLE === "true" ? "/api/auth/mock-callback" : "/api/auth/google?flow=signup"} style={{display:"block",textDecoration:"none"}}>
-                  <button className="modal-submit" type="button" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:".6rem",width:"100%"}}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    Continue with Google
-                  </button>
-                </a>
-                <p className="modal-fine">We only access your Business Profile reviews — nothing else.</p>
-              </>
-            )}
+
 
             {/* ── STEP 4: PAYMENT ── */}
             {planStep === 4 && (

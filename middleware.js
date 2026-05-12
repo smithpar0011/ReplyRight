@@ -50,6 +50,13 @@ export async function middleware(req) {
     }
   }
 
+  // Protect /setup, /payment, /upgrade — require session (not plan)
+  if (pathname === "/setup" || pathname === "/payment" || pathname === "/upgrade") {
+    if (!session) {
+      return NextResponse.redirect(new URL("/signin", req.url));
+    }
+  }
+
   // If already signed in with an active plan, skip signin page
   if (pathname === "/signin") {
     if (session) {
@@ -75,5 +82,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin-dashboard/:path*", "/signin", "/admin-login"],
+  matcher: ["/dashboard/:path*", "/admin-dashboard/:path*", "/signin", "/admin-login", "/setup", "/payment", "/upgrade"],
 };

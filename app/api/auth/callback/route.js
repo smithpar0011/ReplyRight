@@ -49,7 +49,7 @@ export async function GET(req) {
 
   const isSignup = state === "signup";
   const headers = new Headers();
-  const cookieOpts = "HttpOnly; Path=/; SameSite=Lax; Secure";
+  const cookieOpts = "HttpOnly; Path=/; SameSite=Lax; Secure; Domain=.replyrightapp.com";
 
   // Store access token (1 hour)
   headers.append("Set-Cookie", `rr_token=${tokens.access_token}; ${cookieOpts}; Max-Age=3600`);
@@ -70,6 +70,49 @@ export async function GET(req) {
     `rr_user=${encodeURIComponent(userPayload)}; Path=/; SameSite=Lax; Secure; Max-Age=2592000`
   );
 
+  // Read plan selection from rr_signup cookie (browser sends it on this redirect)
+  let signupPlan = null;
+  let signupBilling = null;
+  const incomingCookies = req.headers.get("cookie") || "";
+  const signupCookieMatch = incomingCookies.match(/rr_signup=([^;]+)/);
+  if (signupCookieMatch) {
+    try {
+      const signupData = JSON.parse(decodeURIComponent(signupCookieMatch[1]));
+      if (signupData.plan) {
+        signupPlan = signupData.plan;
+        signupBilling = signupData.billing || "monthly";
+      }
+    } catch {}
+  }
+
+  // Determine where to send the user based on their saved progress
+  function getResumeRedirect(user) {
+    // Completed signup — restore plan cookies and go to dashboard
+    if (user.plan) {
+      headers.append("Set-Cookie", `rr_plan=${user.plan}; Path=/; SameSite=Lax; Secure; Max-Age=2592000`);
+      headers.append("Set-Cookie", `rr_billing=${user.billing || "monthly"}; Path=/; SameSite=Lax; Secure; Max-Age=2592000`);
+      return `${baseUrl}/dashboard`;
+    }
+
+    // Determine best plan to restore (prefer cookie, fall back to DB)
+    const plan = signupPlan || user.signup_plan;
+    const billing = signupBilling || user.signup_billing || "monthly";
+
+    if (plan) {
+      // Restore rr_signup cookie so setup/payment pages show correct plan
+      const restored = encodeURIComponent(JSON.stringify({ plan, billing }));
+      headers.append("Set-Cookie", `rr_signup=${restored}; Path=/; SameSite=Lax; Secure; Max-Age=604800`);
+    }
+
+    // Location selected but payment not done — resume at payment
+    if (user.google_location_id && plan) {
+      return `${baseUrl}/payment`;
+    }
+
+    // Otherwise send to setup (pick location, or pick plan if none saved)
+    return `${baseUrl}/setup`;
+  }
+
   if (isSignup) {
     // Find or create user from Google account
     let user = null;
@@ -89,20 +132,31 @@ export async function GET(req) {
     }
 
     if (user) {
-      // Update existing user's Google tokens
-      await supabase.from("users").update({
+      // Update existing user's Google tokens + save plan progress if present
+      const updateData = {
         google_email: userInfo.email || "",
-        google_refresh_token: tokens.refresh_token || "",
-      }).eq("id", user.id);
+        google_refresh_token: tokens.refresh_token || user.google_refresh_token || "",
+      };
+      if (signupPlan) {
+        updateData.signup_plan = signupPlan;
+        updateData.signup_billing = signupBilling || "monthly";
+      }
+      await supabase.from("users").update(updateData).eq("id", user.id);
+      user = { ...user, ...updateData };
     } else {
       // Create new user from Google
       try {
-        const { data } = await supabase.from("users").insert({
+        const insertData = {
           email: userInfo.email || "",
           name: userInfo.name || "",
           google_email: userInfo.email || "",
           google_refresh_token: tokens.refresh_token || "",
-        }).select().single();
+        };
+        if (signupPlan) {
+          insertData.signup_plan = signupPlan;
+          insertData.signup_billing = signupBilling || "monthly";
+        }
+        const { data } = await supabase.from("users").insert(insertData).select().single();
         user = data;
       } catch (e) {
         console.error("Failed to create user from Google:", e);
@@ -117,9 +171,10 @@ export async function GET(req) {
         { expiresIn: "30d" }
       );
       headers.append("Set-Cookie", `rr_session=${sessionToken}; ${cookieOpts}; Max-Age=2592000`);
+      headers.set("Location", getResumeRedirect(user));
+    } else {
+      headers.set("Location", `${baseUrl}/setup`);
     }
-
-    headers.set("Location", `${baseUrl}/?signup=payment`);
   } else {
     // SIGN-IN flow: look up user by google_email or email
     let user = null;
@@ -148,6 +203,17 @@ export async function GET(req) {
       // No account found — redirect to signin with message
       headers.set("Location", `${baseUrl}/signin?error=no_account`);
     } else {
+      // Update Google tokens
+      const updateData = {
+        google_refresh_token: tokens.refresh_token || user.google_refresh_token || "",
+      };
+      if (signupPlan && !user.plan) {
+        updateData.signup_plan = signupPlan;
+        updateData.signup_billing = signupBilling || "monthly";
+        user = { ...user, ...updateData };
+      }
+      await supabase.from("users").update(updateData).eq("id", user.id);
+
       // Generate session token
       const sessionToken = jwt.sign(
         { userId: user.id, email: user.email },
@@ -158,7 +224,7 @@ export async function GET(req) {
         "Set-Cookie",
         `rr_session=${sessionToken}; ${cookieOpts}; Max-Age=2592000`
       );
-      headers.set("Location", `${baseUrl}/dashboard`);
+      headers.set("Location", getResumeRedirect(user));
     }
   }
 

@@ -52,7 +52,7 @@ export async function POST(req) {
       },
       customer_email: userEmail || undefined,
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/#pricing`,
+      cancel_url: `${baseUrl}/payment`,
       allow_promotion_codes: true,
       billing_address_collection: "auto",
       metadata: { plan, billing, userId: userId || "" },
