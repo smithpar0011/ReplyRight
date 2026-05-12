@@ -56,7 +56,7 @@ export default function Setup() {
     if (selected.length === 0) return;
     setSaving(true);
     try {
-      await fetch("/api/locations/select", {
+      const res = await fetch("/api/locations/select", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,7 +65,16 @@ export default function Setup() {
           locations: selected.map(l => ({ id: l.id, name: l.name })),
         }),
       });
-    } catch {}
+      if (!res.ok) {
+        setError("Failed to save your selection. Please try again.");
+        setSaving(false);
+        return;
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+      setSaving(false);
+      return;
+    }
     setSaving(false);
     router.push("/payment");
   }
@@ -139,8 +148,8 @@ export default function Setup() {
                 ✓ {planLabel}
               </span>
             ) : (
-              <a href="/" style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:100,padding:".3rem .9rem",fontSize:".8rem",fontWeight:600,color:"#ef4444",textDecoration:"none",display:"inline-block"}}>
-                ⚠ No plan selected — go back to choose one
+              <a href="/upgrade" style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:100,padding:".3rem .9rem",fontSize:".8rem",fontWeight:600,color:"#ef4444",textDecoration:"none",display:"inline-block"}}>
+                ⚠ No plan selected — choose one →
               </a>
             )}
           </div>

@@ -12,6 +12,7 @@ export default function Payment() {
   const [billing, setBilling] = useState("monthly");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const annual = billing === "annual";
   const price = PRICES[plan] ? (annual ? PRICES[plan].annual : PRICES[plan].monthly) : 0;
@@ -39,6 +40,7 @@ export default function Payment() {
 
   async function handleStartTrial() {
     setLoading(true);
+    setCheckoutError("");
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -46,8 +48,14 @@ export default function Payment() {
         body: JSON.stringify({ plan, billing }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch {}
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setCheckoutError(data.error || "Something went wrong. Please try again.");
+    } catch {
+      setCheckoutError("Network error. Please check your connection and try again.");
+    }
     setLoading(false);
   }
 
@@ -141,7 +149,7 @@ export default function Payment() {
                     try {
                       const d = JSON.parse(decodeURIComponent(match[1]));
                       d.billing = "annual";
-                      document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify(d))}; Path=/; SameSite=Lax; Max-Age=1800`;
+                      document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify(d))}; Path=/; SameSite=Lax; Max-Age=604800`;
                     } catch {}
                   }
                 }}
@@ -165,6 +173,12 @@ export default function Payment() {
                 <div style={{fontSize:".75rem",color:"#9ca3af"}}>{user.email || "Connected"}</div>
               </div>
               <span style={{marginLeft:"auto",fontSize:".72rem",color:"#16a34a",fontWeight:600,whiteSpace:"nowrap"}}>✓ Connected</span>
+            </div>
+          )}
+
+          {checkoutError && (
+            <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:".75rem 1rem",marginBottom:"1rem"}}>
+              <p style={{color:"#ef4444",fontSize:".85rem",margin:0}}>{checkoutError}</p>
             </div>
           )}
 
