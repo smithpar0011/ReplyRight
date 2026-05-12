@@ -32,10 +32,10 @@ export async function middleware(req) {
       res.cookies.delete("rr_billing");
       return res;
     }
-    // Require a paid plan — redirect unpaid users to the pricing/checkout flow
+    // Require a paid plan — redirect unpaid users back into the signup flow
     const planCookie = req.cookies.get("rr_plan")?.value;
     if (!planCookie) {
-      return NextResponse.redirect(new URL("/?upgrade=1", req.url));
+      return NextResponse.redirect(new URL("/setup", req.url));
     }
   }
 
