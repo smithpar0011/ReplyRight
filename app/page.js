@@ -1002,9 +1002,9 @@ export default function Home() {
 
                 <div className="signup-plans">
                   {[
-                    { name:"Starter", features:["Up to 50 reviews/mo","1 business location","AI responses · 4 preset tone styles","Monthly analytics report","Email support"] },
-                    { name:"Pro",     features:["Unlimited reviews","Up to 3 locations","Expanded tone library & branding","Priority response (<1 min)","Monthly analytics report","Priority support"], popular:true },
-                    { name:"Agency", features:["Unlimited reviews","Up to 10 locations","Expanded tone library per location","Priority response (<1 min)","Monthly analytics report","Dedicated support"] },
+                    { name:"Starter", features:["Up to 50 replies/mo","1 business location","20 backfill responses on sign-up","AI responses · 4 preset tone styles","Email support"] },
+                    { name:"Pro",     features:["Unlimited reviews","Up to 3 locations","50 backfill responses on sign-up","Expanded tone library & branding","Priority response (<1 min)","Priority support"], popular:true },
+                    { name:"Agency", features:["Unlimited reviews","Up to 10 locations","100 backfill responses on sign-up","Expanded tone library per location","Priority response (<1 min)","Dedicated support"] },
                   ].map((plan) => {
                     const mo = PRICES[plan.name].monthly;
                     const yr = PRICES[plan.name].annual;
@@ -1620,9 +1620,9 @@ export default function Home() {
         {/* Pricing cards */}
         <div className="pricing-grid">
           {[
-            {name:"Starter",tagline:"Perfect for single-location small businesses.",features:["Up to 50 reviews/month","1 business location","AI responses · 4 preset tone styles","Standard response (within 1 hr)","Monthly analytics report","Email notifications","14-day free trial (card required)"],btn:"btn-outline",featured:false},
-            {name:"Pro",tagline:"Unlimited reviews across up to 3 locations with full brand control.",features:["Unlimited reviews","Up to 3 business locations","Expanded tone library & branding","Priority response (<1 min)","Monthly analytics report","Priority support","14-day free trial (card required)"],btn:"btn-solid",featured:true,badge:"Most Popular"},
-            {name:"Agency",tagline:"Manage multiple locations all under one account.",features:["Unlimited reviews","Up to 10 locations","Expanded tone library per location","Priority response (<1 min)","Monthly analytics report","Dedicated support","14-day free trial (card required)"],btn:"btn-outline",featured:false}
+            {name:"Starter",tagline:"Perfect for single-location small businesses.",features:["Up to 50 replies/month","1 business location","20 backfill responses on sign-up","AI responses · 4 preset tone styles","Standard response (within 1 hr)","Monthly analytics report","Email support","14-day free trial (card required)"],btn:"btn-outline",featured:false},
+            {name:"Pro",tagline:"Unlimited reviews across up to 3 locations with full brand control.",features:["Unlimited reviews","Up to 3 business locations","50 backfill responses on sign-up","Expanded tone library & branding","Priority response (<1 min)","Monthly analytics report","Priority support","14-day free trial (card required)"],btn:"btn-solid",featured:true,badge:"Most Popular"},
+            {name:"Agency",tagline:"Manage multiple locations all under one account.",features:["Unlimited reviews","Up to 10 locations","100 backfill responses on sign-up","Expanded tone library per location","Priority response (<1 min)","Monthly analytics report","Dedicated support","14-day free trial (card required)"],btn:"btn-outline",featured:false}
           ].map(c => {
             const monthlyPrice = PRICES[c.name].monthly;
             const annualPrice = PRICES[c.name].annual;
@@ -1661,6 +1661,7 @@ export default function Home() {
                 {[
                   {feature:"Reviews per month",        starter:"Up to 50",   pro:"Unlimited",   agency:"Unlimited"},
                   {feature:"Business locations",        starter:"1",          pro:"Up to 3",      agency:"Up to 10"},
+                  {feature:"Backfill existing reviews", starter:"20 reviews", pro:"50 reviews",   agency:"100 reviews"},
                   {feature:"AI-generated responses",    starter:"✓",          pro:"✓",            agency:"✓"},
                   {feature:"Response tone options",     starter:"4 presets",  pro:"Expanded library", agency:"Expanded library per location"},
                   {feature:"Response speed",            starter:"Within 1 hr",    pro:"Instant",      agency:"Instant"},
@@ -1697,6 +1698,29 @@ export default function Home() {
                 <div className="explainer-tier">
                   <div className="explainer-tier-badge pro-badge">Pro &amp; Agency</div>
                   <div className="explainer-tier-desc"><strong>Expanded tone library.</strong> Access a wider range of polished tone styles — from formal &amp; luxury to casual &amp; upbeat — plus set your business name sign-off and brand personality. More control, without the complexity of fully custom configuration.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Backfill explainer */}
+          <div className="explainer-card">
+            <div className="explainer-icon">⚡</div>
+            <div className="explainer-body">
+              <div className="explainer-title">Backfill — What does "catch up on existing reviews" mean?</div>
+              <p className="explainer-sub">When you sign up, ReplyRight doesn't just handle future reviews — it <em>goes back and responds to your existing unanswered ones automatically on day one.</em></p>
+              <div className="explainer-tiers">
+                <div className="explainer-tier">
+                  <div className="explainer-tier-badge starter-badge">Starter</div>
+                  <div className="explainer-tier-desc">Responds to your <strong>20 most recent unanswered reviews</strong> the moment you connect your profile.</div>
+                </div>
+                <div className="explainer-tier">
+                  <div className="explainer-tier-badge pro-badge">Pro</div>
+                  <div className="explainer-tier-desc">Catches up on <strong>50 unanswered reviews</strong> — great for businesses with an active review history.</div>
+                </div>
+                <div className="explainer-tier">
+                  <div className="explainer-tier-badge" style={{background:"rgba(245,158,11,0.1)",color:"#b45309",border:"1px solid rgba(245,158,11,0.2)"}}>Agency</div>
+                  <div className="explainer-tier-desc">Responds to <strong>100 existing reviews per location</strong> — ideal for businesses with years of unanswered feedback.</div>
                 </div>
               </div>
             </div>
@@ -1892,9 +1916,10 @@ export default function Home() {
         <div className="steps">
           {[
             {n:"01",img:"https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Connect Google Business Profile",h:"Connect Your Profile",p:"Link your Google Business account in under 2 minutes. No technical skills required."},
-            {n:"02",img:"https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Set your brand tone and voice",h:"Set Your Tone",p:"Choose your brand voice — formal, friendly, or anywhere in between."},
-            {n:"03",img:"https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Automatic review responses",h:"Reviews Handled Automatically",p:"Every new review gets a thoughtful, personalized reply within minutes."},
-            {n:"04",img:"https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Watch your ratings grow",h:"Watch Your Ratings Grow",p:"Businesses that respond get 45% more review volume. Your reputation builds itself."},
+            {n:"02",img:"https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Catch up on existing unanswered reviews",h:"We Catch Up on Your Existing Reviews",p:"On day one, ReplyRight automatically responds to your unanswered reviews — up to 20 on Starter, 50 on Pro, or 100 on Agency. Start with a clean slate."},
+            {n:"03",img:"https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Set your brand tone and voice",h:"Set Your Tone",p:"Choose your brand voice — formal, friendly, or anywhere in between."},
+            {n:"04",img:"https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Automatic review responses",h:"Every New Review, Handled",p:"Every new review gets a thoughtful, personalized reply within minutes — automatically, forever."},
+            {n:"05",img:"https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=200&fit=crop&fm=webp&q=75",alt:"Watch your ratings grow",h:"Watch Your Ratings Grow",p:"Businesses that respond get 45% more review volume. Your reputation builds itself."},
           ].map(({n,img,alt,h,p}) => (
             <div className="step" key={n} style={{padding:0,overflow:"hidden"}}>
               <div style={{position:"relative",height:160,overflow:"hidden"}}>
