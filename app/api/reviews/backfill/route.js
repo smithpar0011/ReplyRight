@@ -83,7 +83,8 @@ export async function POST(req) {
   if (!user) return Response.json({ error: "User not found" }, { status: 404 });
   if (user.backfill_done) return Response.json({ skipped: true, responded: 0, total: 0 });
 
-  const plan = user.plan || "Starter";
+  // user.plan may be null if the Stripe webhook hasn't fired yet — fall back to signup_plan
+  const plan = user.plan || user.signup_plan || "Starter";
   const limit = PLAN_BACKFILL_LIMITS[plan] ?? 20;
 
   if (!user.google_refresh_token) {

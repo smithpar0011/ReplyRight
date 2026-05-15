@@ -472,13 +472,20 @@ export default function Dashboard() {
               <button className="btn-bulk btn-bulk-outline" onClick={generateAll}>
                 Generate All
               </button>
-              <button
-                className="btn-bulk btn-bulk-primary"
-                onClick={postAll}
-                disabled={!pendingReviews.some((r) => responses[r.name] && !posted[r.name])}
-              >
-                Post All Responses
-              </button>
+              {(() => {
+                const atLimit = userStatus?.plan === "Starter" && userStatus?.monthlyLimit && (userStatus?.monthlyCount || 0) >= userStatus.monthlyLimit;
+                return atLimit ? (
+                  <a href="/upgrade" className="btn-upgrade" style={{ padding: ".5rem 1.1rem", borderRadius: 7, fontSize: ".84rem" }}>Upgrade to Post All →</a>
+                ) : (
+                  <button
+                    className="btn-bulk btn-bulk-primary"
+                    onClick={postAll}
+                    disabled={!pendingReviews.some((r) => responses[r.name] && !posted[r.name])}
+                  >
+                    Post All Responses
+                  </button>
+                );
+              })()}
             </div>
           </div>
 
