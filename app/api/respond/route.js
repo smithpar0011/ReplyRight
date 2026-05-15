@@ -21,23 +21,25 @@ async function refreshAccessToken(refreshToken) {
 export async function POST(req) {
   let token = req.cookies.get("rr_token")?.value;
   let refresh = req.cookies.get("rr_refresh")?.value;
+  let userId = null;
+
+  // Always decode session to get userId (needed for plan/monthly limit checks)
+  const sessionToken = req.cookies.get("rr_session")?.value;
+  if (sessionToken) {
+    try {
+      const decoded = jwt.verify(sessionToken, JWT_SECRET);
+      userId = decoded.userId;
+    } catch {}
+  }
 
   // Fallback: use stored refresh token from Supabase via session cookie
-  if (!token && !refresh) {
-    const sessionToken = req.cookies.get("rr_session")?.value;
-    if (sessionToken) {
-      try {
-        const decoded = jwt.verify(sessionToken, JWT_SECRET);
-        const { data: user } = await supabase
-          .from("users")
-          .select("google_refresh_token")
-          .eq("id", decoded.userId)
-          .single();
-        if (user?.google_refresh_token) {
-          refresh = user.google_refresh_token;
-        }
-      } catch {}
-    }
+  if (!token && !refresh && userId) {
+    const { data: u } = await supabase
+      .from("users")
+      .select("google_refresh_token")
+      .eq("id", userId)
+      .single();
+    if (u?.google_refresh_token) refresh = u.google_refresh_token;
   }
 
   if (!token && !refresh) {
@@ -53,6 +55,27 @@ export async function POST(req) {
       newToken = refreshed.access_token;
     } else {
       return Response.json({ error: "Session expired" }, { status: 401 });
+    }
+  }
+
+  // Enforce monthly limit for Starter plan
+  const planCookie = req.cookies.get("rr_plan")?.value;
+  let userForLimit = null;
+  if (planCookie === "Starter" && userId) {
+    const { data: u } = await supabase
+      .from("users")
+      .select("monthly_reply_count, monthly_reset_date")
+      .eq("id", userId)
+      .single();
+    userForLimit = u;
+    const today = new Date().toISOString().split("T")[0];
+    if (u?.monthly_reset_date && u.monthly_reset_date <= today) {
+      const next = new Date(); next.setMonth(next.getMonth() + 1, 1);
+      await supabase.from("users").update({ monthly_reply_count: 0, monthly_reset_date: next.toISOString().split("T")[0] }).eq("id", userId);
+      userForLimit = { ...u, monthly_reply_count: 0 };
+    }
+    if ((userForLimit?.monthly_reply_count || 0) >= 50) {
+      return Response.json({ error: "Monthly reply limit reached (50/mo on Starter). Upgrade to Pro for unlimited replies.", limitReached: true }, { status: 403 });
     }
   }
 
@@ -79,6 +102,12 @@ export async function POST(req) {
       { error: err.error?.message || "Failed to post response" },
       { status: 500 }
     );
+  }
+
+  // Increment monthly count for Starter
+  if (planCookie === "Starter" && userId) {
+    const count = (userForLimit?.monthly_reply_count || 0) + 1;
+    await supabase.from("users").update({ monthly_reply_count: count }).eq("id", userId);
   }
 
   const response = Response.json({ success: true });

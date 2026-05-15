@@ -34,6 +34,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tone, setTone] = useState("professional");
+  const [userStatus, setUserStatus] = useState(null);
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillResult, setBackfillResult] = useState(null);
+  const [limitError, setLimitError] = useState(null);
 
   // Per-review state: generated response, generating flag, posting flag, posted flag
   const [responses, setResponses] = useState({});
@@ -64,7 +68,30 @@ export default function Dashboard() {
       })
       .catch(() => setError("Failed to load reviews."))
       .finally(() => setLoading(false));
+
+    fetch("/api/user/status")
+      .then((r) => r.json())
+      .then((data) => { if (!data.error) setUserStatus(data); })
+      .catch(() => {});
   }, []);
+
+  async function runBackfill() {
+    setBackfilling(true);
+    setBackfillResult(null);
+    try {
+      const res = await fetch("/api/reviews/backfill", { method: "POST" });
+      const data = await res.json();
+      setBackfillResult(data);
+      setUserStatus((s) => s ? { ...s, backfillDone: true } : s);
+      // Refresh reviews after backfill
+      const rev = await fetch("/api/reviews").then((r) => r.json());
+      if (rev.locations) setLocations(rev.locations);
+    } catch {
+      setBackfillResult({ error: "Backfill failed. Please try again." });
+    } finally {
+      setBackfilling(false);
+    }
+  }
 
   const currentLoc = locations[selectedLoc];
   const pendingReviews = currentLoc?.reviews.filter((r) => !r.reply && r.comment) || [];
@@ -111,6 +138,7 @@ export default function Dashboard() {
     const id = review.name;
     const comment = responses[id];
     if (!comment) return;
+    setLimitError(null);
     setPosting((p) => ({ ...p, [id]: true }));
     try {
       const res = await fetch("/api/respond", {
@@ -119,8 +147,14 @@ export default function Dashboard() {
         body: JSON.stringify({ reviewName: id, comment }),
       });
       const data = await res.json();
-      if (data.success) setPosted((p) => ({ ...p, [id]: true }));
-      else alert("Failed to post: " + data.error);
+      if (data.success) {
+        setPosted((p) => ({ ...p, [id]: true }));
+        setUserStatus((s) => s ? { ...s, monthlyCount: (s.monthlyCount || 0) + 1 } : s);
+      } else if (data.limitReached) {
+        setLimitError(data.error);
+      } else {
+        alert("Failed to post: " + data.error);
+      }
     } finally {
       setPosting((p) => ({ ...p, [id]: false }));
     }
@@ -269,6 +303,41 @@ export default function Dashboard() {
         .empty-icon { font-size: 2.2rem; margin-bottom: .7rem; }
         .error-banner { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px; padding: 1rem 1.4rem; color: var(--danger); font-size: .88rem; }
 
+        /* BACKFILL BANNER */
+        .backfill-banner {
+          background: linear-gradient(135deg,#eef3ff,#f2eeff); border: 1.5px solid rgba(46,125,247,.2);
+          border-radius: 12px; padding: 1rem 1.3rem; margin: 1.2rem 2rem 0;
+          display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+        }
+        .backfill-banner-text { font-size: .88rem; color: var(--navy); line-height: 1.5; }
+        .backfill-banner-text strong { font-weight: 600; }
+        .btn-backfill {
+          padding: .45rem 1.1rem; border-radius: 7px; font-size: .82rem; font-weight: 600;
+          cursor: pointer; font-family: 'DM Sans', sans-serif; border: none;
+          background: var(--accent); color: white; transition: all .2s; white-space: nowrap;
+        }
+        .btn-backfill:hover:not(:disabled) { background: #1a6fe8; }
+        .btn-backfill:disabled { opacity: .6; cursor: not-allowed; }
+
+        /* USAGE BAR */
+        .usage-bar-wrap { display: flex; flex-direction: column; gap: .3rem; min-width: 160px; }
+        .usage-bar-labels { display: flex; justify-content: space-between; font-size: .72rem; color: var(--text-light); font-weight: 500; }
+        .usage-bar-bg { background: var(--cream-dark); border-radius: 100px; height: 5px; overflow: hidden; }
+        .usage-bar-fill { height: 100%; border-radius: 100px; transition: width .4s; }
+
+        /* LIMIT ERROR */
+        .limit-banner {
+          background: #fef9ee; border: 1.5px solid #fbbf24; border-radius: 10px;
+          padding: .9rem 1.3rem; margin-bottom: 1.2rem; display: flex; align-items: center;
+          justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+        }
+        .limit-banner-text { font-size: .88rem; color: #92400e; line-height: 1.5; }
+        .btn-upgrade {
+          padding: .4rem 1rem; border-radius: 7px; font-size: .82rem; font-weight: 600;
+          cursor: pointer; font-family: 'DM Sans', sans-serif;
+          background: #f59e0b; color: white; border: none; white-space: nowrap; text-decoration: none;
+        }
+
         @media(max-width: 600px) {
           .dash-nav { padding: 0 1rem; }
           .stats-bar { padding: 1rem; gap: 1.5rem; }
@@ -298,6 +367,38 @@ export default function Dashboard() {
           </a>
         </div>
       </nav>
+
+      {/* BACKFILL BANNER */}
+      {userStatus && !userStatus.backfillDone && !backfilling && !backfillResult && (
+        <div className="backfill-banner">
+          <div className="backfill-banner-text">
+            <strong>Respond to your existing reviews</strong> — Let AI catch up on unanswered reviews from before you joined.
+          </div>
+          <button className="btn-backfill" onClick={runBackfill}>
+            Run Backfill →
+          </button>
+        </div>
+      )}
+      {backfilling && (
+        <div className="backfill-banner">
+          <div className="backfill-banner-text">
+            <span className="spinner" style={{ verticalAlign: "middle", marginRight: 8 }} />
+            <strong>Responding to your existing reviews…</strong> This may take up to a minute.
+          </div>
+        </div>
+      )}
+      {backfillResult && !backfillResult.error && (
+        <div className="backfill-banner" style={{ background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderColor: "rgba(22,163,74,.2)" }}>
+          <div className="backfill-banner-text">
+            ✓ <strong>Backfill complete</strong> — Responded to {backfillResult.responded} of {backfillResult.total} existing reviews.
+          </div>
+        </div>
+      )}
+      {backfillResult?.error && (
+        <div className="backfill-banner" style={{ background: "#fef2f2", borderColor: "#fca5a5" }}>
+          <div className="backfill-banner-text" style={{ color: "var(--danger)" }}>{backfillResult.error}</div>
+        </div>
+      )}
 
       {/* LOADING */}
       {loading && (
@@ -343,6 +444,30 @@ export default function Dashboard() {
               </div>
               <div className="stat-lbl">Avg Rating</div>
             </div>
+            {userStatus?.plan === "Starter" && userStatus?.monthlyLimit && (
+              <div className="stat-item">
+                <div className="usage-bar-wrap">
+                  <div className="usage-bar-labels">
+                    <span>{userStatus.monthlyCount || 0} / {userStatus.monthlyLimit} replies</span>
+                    {userStatus.monthlyReset && (
+                      <span>Resets {new Date(userStatus.monthlyReset).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                    )}
+                  </div>
+                  <div className="usage-bar-bg">
+                    <div
+                      className="usage-bar-fill"
+                      style={{
+                        width: `${Math.min(100, ((userStatus.monthlyCount || 0) / userStatus.monthlyLimit) * 100)}%`,
+                        background: (userStatus.monthlyCount || 0) >= userStatus.monthlyLimit * 0.9 ? "#ef4444" : "var(--accent)",
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: ".68rem", color: "var(--text-light)" }}>
+                    Monthly replies · <a href="/upgrade" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Upgrade for unlimited</a>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="stats-actions">
               <button className="btn-bulk btn-bulk-outline" onClick={generateAll}>
                 Generate All
@@ -387,6 +512,14 @@ export default function Dashboard() {
           </div>
 
           <div className="dash-main">
+            {/* LIMIT ERROR */}
+            {limitError && (
+              <div className="limit-banner">
+                <div className="limit-banner-text">⚠️ {limitError}</div>
+                <a href="/upgrade" className="btn-upgrade">Upgrade to Pro →</a>
+              </div>
+            )}
+
             {/* PENDING REVIEWS */}
             {pendingReviews.length > 0 && (
               <>
@@ -443,15 +576,20 @@ export default function Dashboard() {
                       <div className="card-actions">
                         {isPosted ? (
                           <button className="btn-post success" disabled>✓ Posted</button>
-                        ) : (
-                          <button
-                            className="btn-post"
-                            onClick={() => postResponse(review)}
-                            disabled={!response || isPosting || isGenerating}
-                          >
-                            {isPosting ? "Posting…" : "Post Response"}
-                          </button>
-                        )}
+                        ) : (() => {
+                          const atLimit = userStatus?.plan === "Starter" && userStatus?.monthlyLimit && (userStatus?.monthlyCount || 0) >= userStatus.monthlyLimit;
+                          return atLimit ? (
+                            <a href="/upgrade" className="btn-upgrade" style={{ padding: ".45rem 1.1rem", borderRadius: 6, fontSize: ".82rem" }}>Upgrade to Post →</a>
+                          ) : (
+                            <button
+                              className="btn-post"
+                              onClick={() => postResponse(review)}
+                              disabled={!response || isPosting || isGenerating}
+                            >
+                              {isPosting ? "Posting…" : "Post Response"}
+                            </button>
+                          );
+                        })()}
                         <button
                           className="btn-gen"
                           onClick={() => generateResponse(review)}
