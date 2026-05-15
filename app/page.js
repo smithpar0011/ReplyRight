@@ -327,6 +327,29 @@ export default function Home() {
     }
   };
 
+  // Smart CTA handler — resumes mid-signup users instead of restarting the flow
+  const handleGetStarted = (plan = null) => {
+    // If user completed signup, go to dashboard
+    if (document.cookie.includes("rr_plan=")) {
+      window.location.href = "/dashboard";
+      return;
+    }
+    // If user is logged in mid-signup, update plan cookie and resume at /setup
+    if (document.cookie.includes("rr_user=")) {
+      if (plan) {
+        const match = document.cookie.match(/rr_signup=([^;]+)/);
+        let existing = {};
+        if (match) { try { existing = JSON.parse(decodeURIComponent(match[1])); } catch {} }
+        existing.plan = plan;
+        document.cookie = `rr_signup=${encodeURIComponent(JSON.stringify(existing))}; Path=/; SameSite=Lax; Max-Age=604800`;
+      }
+      window.location.href = "/setup";
+      return;
+    }
+    // Not logged in — open the signup modal
+    openModal(plan);
+  };
+
   // Handle sign-in within checkout flow (Step 2 — existing users)
   const handleSigninToCheckout = async () => {
     setSignupError("");
@@ -1129,7 +1152,7 @@ export default function Home() {
           <button onClick={() => { scrollTo("pricing"); setMenuOpen(false); }}>Pricing</button>
           <button onClick={() => { scrollTo("faq"); setMenuOpen(false); }}>FAQ</button>
           <a href="/signin" className="mobile-cta-pill" style={{textDecoration:"none",fontFamily:"'Poppins',sans-serif",fontWeight:600}}>Sign In</a>
-          <button className="mobile-cta-pill" onClick={() => { openModal(); setMenuOpen(false); }}>Start Free Trial</button>
+          <button className="mobile-cta-pill" onClick={() => { handleGetStarted(); setMenuOpen(false); }}>Start Free Trial</button>
         </div>
       )}
 
@@ -1145,7 +1168,7 @@ export default function Home() {
           <a href="/signin" style={{ textDecoration: "none" }}>
             <button className="nav-btn" style={{ color: "rgba(15,31,56,0.65)" }}>Sign In</button>
           </a>
-          <button className="nav-btn nav-cta" onClick={() => openModal()}
+          <button className="nav-btn nav-cta" onClick={() => handleGetStarted()}
             style={{borderRadius:"100px",padding:".45rem 1.3rem",background:"var(--navy)",color:"white",border:"none",fontWeight:600,fontSize:".84rem",cursor:"pointer",transition:"all .2s",boxShadow:"0 2px 10px rgba(15,31,56,.18)"}}>
             Start Free Trial
           </button>
@@ -1183,7 +1206,7 @@ export default function Home() {
         <h1 className="animate-2" style={{position:"relative",zIndex:3}}>Every review answered.<br /><em>Automatically.</em></h1>
         <p className="hero-sub animate-2" style={{position:"relative",zIndex:3}}>ReplyRight responds to every Google review your business receives — within minutes, with professional, personalized replies. No staff. No effort. No missed reviews.</p>
         <div className="hero-actions animate-3" style={{position:"relative",zIndex:3}}>
-          <button className="btn-primary" onClick={() => openModal()}>Start Your Free Trial</button>
+          <button className="btn-primary" onClick={() => handleGetStarted()}>Start Your Free Trial</button>
           <button className="btn-secondary" onClick={() => scrollTo("demo")}>
             See Live Demo
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9m0 0L8 3.5M11.5 7 8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -1541,7 +1564,7 @@ export default function Home() {
 
         <div style={{textAlign:"center",marginTop:"3rem"}}>
           <p style={{color:"var(--text-mid)",fontSize:".92rem",marginBottom:"1.2rem"}}>Every review gets a thoughtful, personalized reply — automatically, 24/7.</p>
-          <button className="btn-primary" onClick={() => openModal()}>Start Your Free Trial</button>
+          <button className="btn-primary" onClick={() => handleGetStarted()}>Start Your Free Trial</button>
         </div>
       </section>
 
@@ -1612,7 +1635,7 @@ export default function Home() {
                 <div className="price-period">{annual ? "per month, billed annually" : "per month"}</div>
                 <div className="price-tagline">{c.tagline}</div>
                 <ul className="price-features">{c.features.map(f => <li key={f}>{f}</li>)}</ul>
-                <button className={`price-btn ${c.btn}`} onClick={() => openModal(c.name)}>
+                <button className={`price-btn ${c.btn}`} onClick={() => handleGetStarted(c.name)}>
                   Get Started Free
                 </button>
                 {annual && <div className="price-annual-note">Save ${(monthlyPrice - annualPrice) * 12}/year vs monthly</div>}
@@ -1945,7 +1968,7 @@ export default function Home() {
         <div className="cta-glow" />
         <h2>Your reputation deserves better<br />than silence.</h2>
         <p>Join hundreds of businesses responding to every review, automatically.</p>
-        <button className="cta-btn" onClick={() => openModal()}>Start Your Free 14-Day Trial</button>
+        <button className="cta-btn" onClick={() => handleGetStarted()}>Start Your Free 14-Day Trial</button>
         <p className="cta-note">Cancel anytime · Setup in under 5 minutes</p>
         <div className="guarantee-row">
           <span className="guarantee-badge">🔒 Your data stays private</span>

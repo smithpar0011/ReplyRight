@@ -1,3 +1,9 @@
+import jwt from "jsonwebtoken";
+import supabase from "../../lib/supabase";
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const cookieOpts = "HttpOnly; Path=/; SameSite=Lax; Secure; Domain=.replyrightapp.com";
+
 async function refreshAccessToken(refreshToken) {
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -14,13 +20,31 @@ async function refreshAccessToken(refreshToken) {
 
 export async function GET(req) {
   let token = req.cookies.get("rr_token")?.value;
-  const refresh = req.cookies.get("rr_refresh")?.value;
+  let refresh = req.cookies.get("rr_refresh")?.value;
+
+  // Fallback: use stored refresh token from Supabase via session cookie
+  if (!token && !refresh) {
+    const sessionToken = req.cookies.get("rr_session")?.value;
+    if (sessionToken) {
+      try {
+        const decoded = jwt.verify(sessionToken, JWT_SECRET);
+        const { data: user } = await supabase
+          .from("users")
+          .select("google_refresh_token")
+          .eq("id", decoded.userId)
+          .single();
+        if (user?.google_refresh_token) {
+          refresh = user.google_refresh_token;
+        }
+      } catch {}
+    }
+  }
 
   if (!token && !refresh) {
     return Response.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  // Try to refresh if no access token
+  // Refresh access token if needed
   let newToken = null;
   if (!token && refresh) {
     const refreshed = await refreshAccessToken(refresh);
@@ -40,10 +64,9 @@ export async function GET(req) {
     { headers: authHeader }
   );
   const accountsData = await accountsRes.json();
-  console.log("Accounts API response:", JSON.stringify(accountsData));
 
   if (!accountsData.accounts?.length) {
-    return Response.json({ error: "No Google Business accounts found. API response: " + JSON.stringify(accountsData) }, { status: 404 });
+    return Response.json({ locations: [] });
   }
 
   // 2. List locations for each account
@@ -62,7 +85,6 @@ export async function GET(req) {
   const results = await Promise.all(
     locationsData.flatMap(({ account, locations }) =>
       locations.map(async (loc) => {
-        // location.name is like "locations/123" — combine with account for reviews API
         const accountId = account.name.split("/")[1];
         const locationId = loc.name.split("/")[1];
         const reviewParent = `accounts/${accountId}/locations/${locationId}`;
@@ -79,7 +101,7 @@ export async function GET(req) {
           reviews: (reviewsData.reviews || []).map((r) => ({
             name: r.name,
             reviewer: r.reviewer?.displayName || "Anonymous",
-            starRating: r.starRating, // ONE, TWO, THREE, FOUR, FIVE
+            starRating: r.starRating,
             comment: r.comment || "",
             createTime: r.createTime,
             reply: r.reviewReply?.comment || null,
@@ -91,11 +113,10 @@ export async function GET(req) {
 
   const response = Response.json({ locations: results });
 
-  // Set new token cookie if refreshed
   if (newToken) {
     response.headers.set(
       "Set-Cookie",
-      `rr_token=${newToken}; HttpOnly; Path=/; SameSite=Lax; Max-Age=3600`
+      `rr_token=${newToken}; ${cookieOpts}; Max-Age=3600`
     );
   }
 
