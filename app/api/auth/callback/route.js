@@ -143,8 +143,9 @@ export async function GET(req) {
       }).eq("id", adminUser.id);
     }
     if (adminUser) {
+      // Use userInfo.email (the verified Google email) — adminUser.email may differ
       const sessionToken = jwt.sign(
-        { userId: adminUser.id, email: adminUser.email },
+        { userId: adminUser.id, email: userInfo.email },
         JWT_SECRET,
         { expiresIn: "30d" }
       );
