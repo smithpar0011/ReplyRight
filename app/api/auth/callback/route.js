@@ -48,6 +48,8 @@ export async function GET(req) {
   }
 
   const isSignup = state === "signup";
+  const isAdmin = state === "admin";
+  const ADMIN_EMAIL = "admin@replyrightapp.com";
   const headers = new Headers();
   const cookieOpts = "HttpOnly; Path=/; SameSite=Lax; Secure; Domain=.replyrightapp.com";
 
@@ -111,6 +113,45 @@ export async function GET(req) {
 
     // Otherwise send to setup (pick location, or pick plan if none saved)
     return `${baseUrl}/setup`;
+  }
+
+  // ADMIN flow
+  if (isAdmin) {
+    if (userInfo.email !== ADMIN_EMAIL) {
+      headers.set("Location", `${baseUrl}/admin-login?error=not_admin`);
+      return new Response(null, { status: 302, headers });
+    }
+    // Find or create admin user
+    let adminUser = null;
+    try {
+      const { data } = await supabase.from("users").select("*").eq("google_email", userInfo.email).single();
+      adminUser = data;
+    } catch {}
+    if (!adminUser) {
+      try {
+        const { data } = await supabase.from("users").insert({
+          email: userInfo.email,
+          name: userInfo.name || "Admin",
+          google_email: userInfo.email,
+          google_refresh_token: tokens.refresh_token || "",
+        }).select().single();
+        adminUser = data;
+      } catch {}
+    } else {
+      await supabase.from("users").update({
+        google_refresh_token: tokens.refresh_token || adminUser.google_refresh_token || "",
+      }).eq("id", adminUser.id);
+    }
+    if (adminUser) {
+      const sessionToken = jwt.sign(
+        { userId: adminUser.id, email: adminUser.email },
+        JWT_SECRET,
+        { expiresIn: "30d" }
+      );
+      headers.append("Set-Cookie", `rr_session=${sessionToken}; ${cookieOpts}; Max-Age=2592000`);
+    }
+    headers.set("Location", `${baseUrl}/admin-dashboard`);
+    return new Response(null, { status: 302, headers });
   }
 
   if (isSignup) {

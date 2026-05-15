@@ -1,50 +1,46 @@
-import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import supabase from "../../../lib/supabase";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_EMAIL = "admin@replyrightapp.com";
 
-function requireAdmin() {
-  const cookieStore = cookies();
-  const token = cookieStore.get("rr_session")?.value;
-  if (!token) return null;
+async function verifyAdmin(req) {
+  const sessionToken = req.cookies.get("rr_session")?.value;
+  if (!sessionToken) return null;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.email !== "admin@replyrightapp.com") return null;
+    const decoded = jwt.verify(sessionToken, JWT_SECRET);
+    if (decoded.email !== ADMIN_EMAIL) return null;
     return decoded;
   } catch {
     return null;
   }
 }
 
-export async function GET() {
-  if (!requireAdmin()) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET(req) {
+  const admin = await verifyAdmin(req);
+  if (!admin) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await supabase
+  const { data: users, error } = await supabase
     .from("users")
-    .select("id, email, name, plan, billing, created_at, stripe_customer_id, stripe_subscription_id")
+    .select("id, email, name, google_email, plan, billing, stripe_customer_id, google_location_name, signup_plan, monthly_reply_count, monthly_reset_date, backfill_done, created_at")
     .order("created_at", { ascending: false });
 
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ users: data });
+  if (error) return Response.json({ error: "Failed to fetch users" }, { status: 500 });
+  return Response.json({ users });
 }
 
 export async function PATCH(req) {
-  if (!requireAdmin()) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const admin = await verifyAdmin(req);
+  if (!admin) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, plan, billing } = await req.json();
-  const { error } = await supabase
-    .from("users")
-    .update({ plan, billing })
-    .eq("id", id);
+  const { userId, plan, billing } = await req.json();
+  if (!userId) return Response.json({ error: "userId required" }, { status: 400 });
 
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ success: true });
+  const update = {};
+  if (plan !== undefined) update.plan = plan || null;
+  if (billing !== undefined) update.billing = billing || null;
+
+  const { error } = await supabase.from("users").update(update).eq("id", userId);
+  if (error) return Response.json({ error: "Failed to update user" }, { status: 500 });
+  return Response.json({ ok: true });
 }

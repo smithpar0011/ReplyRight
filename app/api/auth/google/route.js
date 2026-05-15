@@ -15,6 +15,7 @@ export async function GET(req) {
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
       ];
+  // admin flow uses same minimal scopes as signin
 
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
